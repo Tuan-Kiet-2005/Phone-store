@@ -14,8 +14,90 @@
 <body>
 
 <!-- NAVBAR -->
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <span class="topbar-item"><i class="bi bi-shield-check"></i> Hàng chính hãng 100%</span>
+        <span class="topbar-item"><i class="bi bi-truck"></i> Miễn phí ship đơn từ 500K</span>
+        <span class="topbar-item"><i class="bi bi-arrow-repeat"></i> Đổi trả trong 30 ngày</span>
+        <span class="topbar-item"><i class="bi bi-headset"></i> Hotline: 1800 2097</span>
+    </div>
+</div>
+
+<!-- NAVBAR -->
 <nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="navbar-brand">Phone<span>Store</span></a>
+
+        <!-- Search -->
+        <div class="search-wrap" style="position:relative; flex:1; max-width:480px; margin:0 24px;">
+            <input type="text" id="searchInput"
+                   placeholder="Bạn muốn tìm gì hôm nay?"
+                   autocomplete="off">
+            <button class="search-btn">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+
+        <!-- Nav links -->
+        <ul class="nav-links">
+            <li><a href="products.html"><i class="bi bi-phone"></i> Sản phẩm</a></li>
+            <li><a href="#"><i class="bi bi-shield-check"></i> Chính sách</a></li>
+            <li><a href="contact.html"><i class="bi bi-headset"></i> Liên hệ</a></li>
+        </ul>
+
+        <!-- Giỏ hàng -->
+        <a href="cart.html" class="cart-link">
+            <i class="bi bi-bag" style="font-size:1.1rem"></i>
+            Giỏ hàng
+        </a>
+
+        <!-- Đăng nhập -->
+        <a href="login.html" class="btn-login">
+            <i class="bi bi-person"></i> Đăng nhập
+        </a>
+
+        <button class="hamburger-nav" onclick="openMobileMenu()">
+            <i class="bi bi-list"></i>
+        </button>
+    </div>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+        <span class="navbar-brand">Phone<span>Store</span></span>
+        <button class="mobile-menu-close" onclick="closeMobileMenu()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    <nav class="mobile-nav">
+        <a href="products.html" class="mobile-nav-item"><i class="bi bi-phone"></i> Sản phẩm</a>
+        <a href="#" class="mobile-nav-item"><i class="bi bi-tag"></i> Khuyến mãi</a>
+        <a href="#" class="mobile-nav-item"><i class="bi bi-shield-check"></i> Chính sách</a>
+        <a href="contact.html" class="mobile-nav-item"><i class="bi bi-headset"></i> Liên hệ</a>
+        <div class="mobile-nav-divider"></div>
+        <a href="cart.html" class="mobile-nav-item"><i class="bi bi-bag"></i> Giỏ hàng</a>
+        <div class="mobile-nav-divider"></div>
+        <a href="login.html" class="mobile-nav-item" style="color:var(--primary);font-weight:700">
+            <i class="bi bi-person"></i> Đăng nhập
+        </a>
+    </nav>
+</div>
+
+<script>
+function openMobileMenu() {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.getElementById('mobileOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeMobileMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+</script>
 
 <!-- QUICK CATEGORY BAR -->
 <div class="quick-cats">
