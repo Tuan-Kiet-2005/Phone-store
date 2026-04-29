@@ -616,6 +616,11 @@ body {
     color: var(--gray-light);
     text-decoration: line-through;
 }
+
+    .product-price-wrap {
+    min-height: 48px; /* thêm dòng này */
+
+}
 .btn-add-cart {
     width: 100%;
     background: var(--primary);

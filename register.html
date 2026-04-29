@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - Phone Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #0057FF;
+            --primary-dark: #0040CC;
+            --dark: #0A0A0A;
+            --gray: #6B7280;
+            --light: #F8F8F8;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+            --success: #059669;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #f0f4ff;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            background: var(--primary); color: #fff;
+            text-align: center; font-size: 0.78rem; padding: 7px 16px;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #fff; border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .navbar-brand {
+            font-weight: 800; font-size: 1.3rem;
+            color: var(--dark); text-decoration: none;
+        }
+        .navbar-brand span { color: var(--primary); }
+        .navbar-back {
+            display: flex; align-items: center; gap: 6px;
+            color: var(--gray); text-decoration: none;
+            font-size: 0.85rem; font-weight: 600; transition: color 0.2s;
+        }
+        .navbar-back:hover { color: var(--primary); }
+
+        /* AUTH LAYOUT */
+        .auth-wrapper {
+            flex: 1; display: flex;
+            align-items: center; justify-content: center; padding: 40px 16px;
+        }
+        .auth-container {
+            display: grid; grid-template-columns: 1fr 1.2fr;
+            width: 100%; max-width: 960px;
+            background: #fff; border-radius: 24px; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+
+        /* LEFT */
+        .auth-left {
+            background: linear-gradient(145deg, #0A0A0A 0%, #0d1b3e 100%);
+            padding: 52px 40px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: relative; overflow: hidden;
+        }
+        .auth-left::before {
+            content: ''; position: absolute;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(0,87,255,0.3) 0%, transparent 70%);
+            top: -80px; right: -80px;
+        }
+        .auth-left::after {
+            content: ''; position: absolute;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(0,87,255,0.15) 0%, transparent 70%);
+            bottom: -40px; left: -40px;
+        }
+        .auth-left-brand { font-size: 1.5rem; font-weight: 800; color: #fff; }
+        .auth-left-brand span { color: var(--primary); }
+        .auth-left-content { position: relative; z-index: 1; }
+        .auth-left-title {
+            font-size: 1.8rem; font-weight: 800; color: #fff;
+            line-height: 1.2; margin-bottom: 14px;
+        }
+        .auth-left-title span { color: #60A5FA; }
+        .auth-left-desc {
+            color: rgba(255,255,255,0.55); font-size: 0.875rem;
+            line-height: 1.7; margin-bottom: 28px;
+        }
+        .auth-steps { display: flex; flex-direction: column; gap: 14px; }
+        .auth-step { display: flex; align-items: flex-start; gap: 12px; }
+        .auth-step-num {
+            width: 26px; height: 26px; flex-shrink: 0;
+            background: var(--primary); color: #fff;
+            border-radius: 50%; font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 1px;
+        }
+        .auth-step-text { color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.5; }
+        .auth-step-text strong { color: #fff; display: block; margin-bottom: 2px; }
+        .auth-left-footer {
+            color: rgba(255,255,255,0.3); font-size: 0.75rem; position: relative; z-index: 1;
+        }
+
+        /* RIGHT */
+        .auth-right { padding: 44px; overflow-y: auto; }
+        .auth-title {
+            font-size: 1.6rem; font-weight: 800; color: var(--dark);
+            margin-bottom: 6px; letter-spacing: -0.3px;
+        }
+        .auth-subtitle {
+            color: var(--gray); font-size: 0.875rem; margin-bottom: 28px;
+        }
+        .auth-subtitle a { color: var(--primary); font-weight: 600; text-decoration: none; }
+        .auth-subtitle a:hover { text-decoration: underline; }
+
+        /* FORM */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label {
+            display: block; font-size: 0.82rem;
+            font-weight: 700; color: var(--dark); margin-bottom: 6px;
+        }
+        .form-label .required { color: var(--danger); margin-left: 2px; }
+        .input-wrap { position: relative; }
+        .input-wrap .input-icon {
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray); font-size: 1rem; pointer-events: none;
+        }
+        .input-wrap input {
+            width: 100%;
+            background: var(--light); border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 11px 14px 11px 40px;
+            font-size: 0.875rem; font-family: 'Nunito', sans-serif;
+            color: var(--dark); outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-wrap input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,87,255,0.08);
+            background: #fff;
+        }
+        .input-wrap input.is-error { border-color: var(--danger); }
+        .input-wrap input.is-valid { border-color: #22C55E; }
+        .toggle-password {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--gray);
+            cursor: pointer; font-size: 1rem; padding: 0; transition: color 0.2s;
+        }
+        .toggle-password:hover { color: var(--primary); }
+
+        /* PASSWORD STRENGTH */
+        .strength-bar {
+            height: 3px; border-radius: 2px; background: var(--border);
+            margin-top: 6px; overflow: hidden;
+        }
+        .strength-fill {
+            height: 100%; border-radius: 2px; width: 0;
+            transition: width 0.3s, background 0.3s;
+        }
+        .password-hint { font-size: 0.75rem; color: var(--gray); margin-top: 5px; }
+
+        /* ALERTS */
+        .alert-error {
+            background: #FEF2F2; border: 1px solid #FECACA;
+            color: #DC2626; border-radius: 10px;
+            padding: 11px 14px; font-size: 0.85rem; margin-bottom: 20px;
+            display: none; align-items: center; gap: 8px;
+        }
+        .alert-error.show { display: flex; }
+
+        .alert-success {
+            background: #F0FDF4; border: 1px solid #BBF7D0;
+            color: var(--success); border-radius: 10px;
+            padding: 24px 16px; font-size: 0.875rem;
+            text-align: center; display: none;
+        }
+        .alert-success.show { display: block; }
+        .alert-success .success-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+        .alert-success strong { font-size: 1rem; display: block; margin-bottom: 6px; }
+        .alert-success a {
+            color: var(--success); font-weight: 700; text-decoration: none;
+            display: inline-block; margin-top: 12px;
+            padding: 8px 20px; border: 2px solid var(--success);
+            border-radius: 8px; transition: all 0.2s;
+        }
+        .alert-success a:hover { background: var(--success); color: #fff; }
+
+        /* BUTTON */
+        .btn-submit {
+            width: 100%; background: var(--primary); color: #fff;
+            border: none; border-radius: 10px; padding: 13px;
+            font-size: 0.9rem; font-weight: 700;
+            font-family: 'Nunito', sans-serif; cursor: pointer;
+            transition: all 0.2s; margin-top: 4px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-submit:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,87,255,0.25);
+        }
+        .btn-submit:active { transform: translateY(0); }
+        .btn-submit.loading { opacity: 0.75; pointer-events: none; }
+
+        .auth-login-link {
+            text-align: center; font-size: 0.875rem;
+            color: var(--gray); margin-top: 16px;
+        }
+        .auth-login-link a { color: var(--primary); font-weight: 600; text-decoration: none; }
+        .auth-login-link a:hover { text-decoration: underline; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .auth-container { grid-template-columns: 1fr; max-width: 480px; }
+            .auth-left { display: none; }
+            .auth-right { padding: 36px 24px; }
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+        }
+        @media (max-width: 480px) {
+            .auth-right { padding: 28px 18px; }
+            .auth-title { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <i class="bi bi-shield-check"></i> Hàng chính hãng 100% &nbsp;|&nbsp;
+    <i class="bi bi-truck"></i> Miễn phí ship đơn từ 500K &nbsp;|&nbsp;
+    <i class="bi bi-arrow-repeat"></i> Đổi trả trong 30 ngày
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="index.html" class="navbar-brand">Phone<span>Store</span></a>
+    <a href="index.html" class="navbar-back">
+        <i class="bi bi-arrow-left"></i> Về trang chủ
+    </a>
+</nav>
+
+<!-- AUTH WRAPPER -->
+<div class="auth-wrapper">
+    <div class="auth-container">
+
+        <!-- LEFT -->
+        <div class="auth-left">
+            <div class="auth-left-brand">Phone<span>Store</span></div>
+            <div class="auth-left-content">
+                <div class="auth-left-title">Tạo tài khoản<br><span>miễn phí 🎉</span></div>
+                <p class="auth-left-desc">Chỉ mất 1 phút để tạo tài khoản và bắt đầu mua sắm ngay hôm nay.</p>
+                <div class="auth-steps">
+                    <div class="auth-step">
+                        <span class="auth-step-num">1</span>
+                        <div class="auth-step-text">
+                            <strong>Điền thông tin</strong>
+                            Họ tên, email và mật khẩu
+                        </div>
+                    </div>
+                    <div class="auth-step">
+                        <span class="auth-step-num">2</span>
+                        <div class="auth-step-text">
+                            <strong>Tạo tài khoản</strong>
+                            Hoàn toàn miễn phí, không mất phí
+                        </div>
+                    </div>
+                    <div class="auth-step">
+                        <span class="auth-step-num">3</span>
+                        <div class="auth-step-text">
+                            <strong>Mua sắm ngay</strong>
+                            Khám phá hàng nghìn sản phẩm
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="auth-left-footer">© 2026 PhoneStore. All rights reserved.</div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="auth-right">
+            <h1 class="auth-title">Đăng ký tài khoản</h1>
+            <p class="auth-subtitle">Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
+
+            <!-- Alert error -->
+            <div class="alert-error" id="alertError">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <span id="alertErrorMsg"></span>
+            </div>
+
+            <!-- Alert success -->
+            <div class="alert-success" id="alertSuccess">
+                <span class="success-icon">🎉</span>
+                <strong>Đăng ký thành công!</strong>
+                Tài khoản của bạn đã được tạo.<br>
+                <a href="login.html">Đăng nhập ngay →</a>
+            </div>
+
+            <!-- Form -->
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Họ và tên <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <i class="bi bi-person input-icon"></i>
+                            <input type="text" id="nameInput"
+                                   placeholder="Nguyễn Văn A" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số điện thoại</label>
+                        <div class="input-wrap">
+                            <i class="bi bi-telephone input-icon"></i>
+                            <input type="tel" id="phoneInput"
+                                   placeholder="0901 234 567">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="bi bi-envelope input-icon"></i>
+                        <input type="email" id="emailInput"
+                               placeholder="example@email.com"
+                               autocomplete="email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mật khẩu <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input type="password" id="passwordInput"
+                               placeholder="Tối thiểu 6 ký tự"
+                               oninput="checkStrength(this.value)"
+                               autocomplete="new-password" required>
+                        <button type="button" class="toggle-password"
+                                onclick="togglePass('passwordInput','eyeIcon1')">
+                            <i class="bi bi-eye" id="eyeIcon1"></i>
+                        </button>
+                    </div>
+                    <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                    <div class="password-hint" id="strengthText">Nhập mật khẩu để kiểm tra độ mạnh</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Xác nhận mật khẩu <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="bi bi-lock-fill input-icon"></i>
+                        <input type="password" id="confirmInput"
+                               placeholder="Nhập lại mật khẩu"
+                               autocomplete="new-password" required>
+                        <button type="button" class="toggle-password"
+                                onclick="togglePass('confirmInput','eyeIcon2')">
+                            <i class="bi bi-eye" id="eyeIcon2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span id="btnText">Tạo tài khoản</span>
+                    <i class="bi bi-arrow-right" id="btnIcon"></i>
+                </button>
+            </form>
+
+            <div class="auth-login-link">
+                Đã có tài khoản? <a href="login.html">Đăng nhập</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function handleRegister(e) {
+    e.preventDefault();
+
+    const name     = document.getElementById('nameInput').value.trim();
+    const phone    = document.getElementById('phoneInput').value.trim();
+    const email    = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    const confirm  = document.getElementById('confirmInput').value.trim();
+    const btn      = document.getElementById('submitBtn');
+    const btnText  = document.getElementById('btnText');
+    const btnIcon  = document.getElementById('btnIcon');
+
+    hideError();
+
+    // Validate
+    if (!name || !email || !password || !confirm) {
+        showError('Vui lòng nhập đầy đủ thông tin bắt buộc!');
+        return;
+    }
+    if (!validateEmail(email)) {
+        showError('Email không hợp lệ!');
+        return;
+    }
+    if (password.length < 6) {
+        showError('Mật khẩu phải có ít nhất 6 ký tự!');
+        return;
+    }
+    if (password !== confirm) {
+        showError('Mật khẩu xác nhận không khớp!');
+        document.getElementById('confirmInput').classList.add('is-error');
+        return;
+    }
+
+    // Kiểm tra email đã tồn tại chưa (fake check)
+    const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const emailExists = existingUsers.find(u => u.email === email);
+    if (emailExists || email === 'admin@test.com' || email === 'user@test.com') {
+        showError('Email này đã được đăng ký!');
+        document.getElementById('emailInput').classList.add('is-error');
+        return;
+    }
+
+    // Loading
+    btn.classList.add('loading');
+    btnText.textContent = 'Đang tạo tài khoản...';
+    btnIcon.className = 'bi bi-arrow-repeat';
+
+    // Giả lập API delay
+    setTimeout(() => {
+        // Lưu user mới vào localStorage
+        const newUser = { name, phone, email, password, role: 'customer' };
+        existingUsers.push(newUser);
+        localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+
+        // Ẩn form, hiện thông báo thành công
+        document.getElementById('registerForm').style.display = 'none';
+        document.querySelector('.auth-login-link').style.display = 'none';
+        document.querySelector('.auth-subtitle').style.display = 'none';
+        document.getElementById('alertSuccess').classList.add('show');
+
+        // Đổi title
+        document.querySelector('.auth-title').textContent = 'Chào mừng bạn! 🎉';
+
+    }, 900);
+}
+
+function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function showError(msg) {
+    document.getElementById('alertErrorMsg').textContent = msg;
+    document.getElementById('alertError').classList.add('show');
+}
+
+function hideError() {
+    document.getElementById('alertError').classList.remove('show');
+    document.querySelectorAll('.is-error').forEach(el => el.classList.remove('is-error'));
+}
+
+function togglePass(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    input.type  = input.type === 'password' ? 'text' : 'password';
+    icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+}
+
+function checkStrength(val) {
+    const fill = document.getElementById('strengthFill');
+    const text = document.getElementById('strengthText');
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+        { w: '0%',   bg: '#E5E7EB', label: 'Nhập mật khẩu để kiểm tra độ mạnh' },
+        { w: '25%',  bg: '#EF4444', label: '😟 Yếu — nên dùng ít nhất 6 ký tự' },
+        { w: '50%',  bg: '#F97316', label: '😐 Trung bình — thêm số hoặc ký tự đặc biệt' },
+        { w: '75%',  bg: '#EAB308', label: '🙂 Khá tốt — thêm chữ hoa để tốt hơn' },
+        { w: '90%',  bg: '#22C55E', label: '😊 Tốt' },
+        { w: '100%', bg: '#059669', label: '💪 Rất mạnh' },
+    ];
+    const lv = val.length === 0 ? 0 : Math.min(score + 1, 5);
+    fill.style.width      = levels[lv].w;
+    fill.style.background = levels[lv].bg;
+    text.textContent      = levels[lv].label;
+    text.style.color      = lv === 0 ? 'var(--gray)' : levels[lv].bg;
+}
+
+// Nếu đã đăng nhập thì về trang chủ
+const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (currentUser.loggedIn) window.location.href = 'index.html';
+</script>
+</body>
+</html>
