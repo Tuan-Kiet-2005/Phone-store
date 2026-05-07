@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng - Phone Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root { --primary:#0057FF; --primary-dark:#0040CC; --dark:#0A0A0A; --gray:#6B7280; --light:#F8F8F8; --border:#E5E7EB; --danger:#EF4444; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Nunito',sans-serif; background:#f8f9fa; }
+
+        .cart-wrap { max-width:1280px; margin:0 auto; padding:24px; display:grid; grid-template-columns:1fr 360px; gap:24px; align-items:start; }
+
+        /* CART TABLE */
+        .cart-card { background:#fff; border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+        .cart-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--border); }
+        .cart-title { font-size:1.1rem; font-weight:800; color:var(--dark); display:flex; align-items:center; gap:8px; }
+        .cart-title::before { content:''; display:inline-block; width:4px; height:18px; background:var(--primary); border-radius:2px; }
+        .btn-clear { background:none; border:1.5px solid var(--border); border-radius:8px; padding:6px 14px; font-size:0.8rem; font-weight:600; color:var(--gray); cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s; }
+        .btn-clear:hover { border-color:var(--danger); color:var(--danger); }
+
+        .cart-item { display:grid; grid-template-columns:24px 80px 1fr auto; gap:16px; align-items:center; padding:16px 24px; border-bottom:1px solid var(--border); transition:background 0.15s; }
+        .cart-item:last-child { border-bottom:none; }
+        .cart-item:hover { background:#FAFAFA; }
+        .cart-item-img { width:80px; height:80px; border-radius:10px; background:var(--light); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:2.2rem; flex-shrink:0; }
+        .cart-item-img img { width:100%; height:100%; object-fit:cover; }
+        .cart-item-brand { font-size:0.68rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+        .cart-item-name { font-weight:700; font-size:0.9rem; color:var(--dark); margin-bottom:8px; line-height:1.3; }
+        .cart-item-name a { color:inherit; text-decoration:none; }
+        .cart-item-name a:hover { color:var(--primary); }
+        .cart-item-price { font-size:1rem; font-weight:800; color:var(--danger); }
+        .cart-item-old { font-size:0.78rem; color:var(--gray); text-decoration:line-through; margin-left:6px; }
+        .cart-item-actions { display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+        .cart-item-subtotal { font-size:1rem; font-weight:800; color:var(--dark); white-space:nowrap; }
+        .qty-ctrl { display:flex; align-items:center; border:1.5px solid var(--border); border-radius:8px; overflow:hidden; }
+        .qty-ctrl button { width:30px; height:30px; background:var(--light); border:none; cursor:pointer; font-size:1rem; color:var(--dark); transition:background 0.15s; }
+        .qty-ctrl button:hover { background:#ddd; }
+        .qty-ctrl input { width:40px; height:30px; border:none; border-left:1.5px solid var(--border); border-right:1.5px solid var(--border); text-align:center; font-size:0.875rem; font-weight:700; font-family:'Nunito',sans-serif; outline:none; }
+        .btn-remove { background:none; border:none; color:var(--gray); cursor:pointer; font-size:0.8rem; padding:0; display:flex; align-items:center; gap:4px; transition:color 0.2s; font-family:'Nunito',sans-serif; }
+        .btn-remove:hover { color:var(--danger); }
+
+        /* ORDER SUMMARY */
+        .summary-card { background:#fff; border:1px solid var(--border); border-radius:16px; padding:24px; position:sticky; top:88px; }
+        .summary-title { font-size:1rem; font-weight:800; color:var(--dark); margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+        .summary-title::before { content:''; display:inline-block; width:4px; height:16px; background:var(--primary); border-radius:2px; }
+        .summary-row { display:flex; justify-content:space-between; align-items:center; font-size:0.875rem; margin-bottom:12px; }
+        .summary-row .label { color:var(--gray); }
+        .summary-row .value { font-weight:700; color:var(--dark); }
+        .summary-divider { height:1px; background:var(--border); margin:16px 0; }
+        .summary-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .summary-total .label { font-weight:700; font-size:0.9rem; color:var(--dark); }
+        .summary-total .value { font-size:1.3rem; font-weight:800; color:var(--danger); }
+        .btn-checkout { width:100%; background:var(--primary); color:#fff; border:none; border-radius:10px; padding:14px; font-size:0.95rem; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all 0.2s; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; }
+        .btn-checkout:hover { background:var(--primary-dark); color:#fff; transform:translateY(-1px); box-shadow:0 6px 20px rgba(0,87,255,0.25); }
+        .btn-continue { width:100%; background:transparent; color:var(--gray); border:1.5px solid var(--border); border-radius:10px; padding:11px; font-size:0.875rem; font-weight:600; font-family:'Nunito',sans-serif; cursor:pointer; transition:all 0.2s; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px; }
+        .btn-continue:hover { border-color:var(--primary); color:var(--primary); }
+
+        /* Empty */
+        .empty-cart { text-align:center; padding:60px 20px; grid-column:1/-1; }
+        .empty-cart-icon { font-size:5rem; margin-bottom:16px; }
+        .empty-cart h3 { font-weight:800; color:var(--dark); margin-bottom:8px; }
+        .empty-cart p { color:var(--gray); margin-bottom:24px; }
+        .btn-shop { background:var(--primary); color:#fff; border:none; border-radius:10px; padding:12px 28px; font-size:0.9rem; font-weight:700; font-family:'Nunito',sans-serif; text-decoration:none; transition:background 0.2s; display:inline-flex; align-items:center; gap:8px; }
+        .btn-shop:hover { background:var(--primary-dark); color:#fff; }
+
+        .cart-badge { background:var(--danger); color:#fff; font-size:0.65rem; font-weight:700; padding:2px 6px; border-radius:100px; margin-left:4px; }
+
+        @media(max-width:900px) { .cart-wrap{grid-template-columns:1fr;} .summary-card{position:static;} }
+        @media(max-width:600px) { .cart-wrap{padding:12px;} .cart-item{grid-template-columns:64px 1fr;} .cart-item-actions{flex-direction:row;align-items:center;grid-column:1/-1;justify-content:space-between;} }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <span class="topbar-item"><i class="bi bi-shield-check"></i> Hàng chính hãng 100%</span>
+        <span class="topbar-item"><i class="bi bi-truck"></i> Miễn phí ship đơn từ 500K</span>
+        <span class="topbar-item"><i class="bi bi-arrow-repeat"></i> Đổi trả trong 30 ngày</span>
+        <span class="topbar-item"><i class="bi bi-headset"></i> Hotline: 1800 2097</span>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="navbar-brand">Phone<span>Store</span></a>
+        <div class="search-wrap" style="position:relative;flex:1;max-width:480px;margin:0 24px;">
+            <input type="text" id="searchInput" placeholder="Bạn muốn tìm gì hôm nay?" autocomplete="off">
+            <button class="search-btn"><i class="bi bi-search"></i></button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="products.html"><i class="bi bi-phone"></i> Sản phẩm</a></li>
+            <li><a href="#"><i class="bi bi-shield-check"></i> Chính sách</a></li>
+            <li><a href="contact.html"><i class="bi bi-headset"></i> Liên hệ</a></li>
+        </ul>
+        <a href="cart.html" class="cart-link" style="color:var(--primary);">
+            <i class="bi bi-bag" style="font-size:1.1rem"></i> Giỏ hàng
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <a href="login.html" class="btn-login" id="loginBtn">
+            <i class="bi bi-person"></i> Đăng nhập
+        </a>
+    </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div style="background:#fff;border-bottom:1px solid var(--border);padding:10px 0;">
+    <div style="max-width:1280px;margin:0 auto;padding:0 24px;font-size:0.82rem;color:var(--gray);">
+        <a href="index.html" style="color:var(--gray);text-decoration:none;">Trang chủ</a>
+        <i class="bi bi-chevron-right" style="font-size:0.7rem;margin:0 6px;"></i>
+        <span style="color:var(--dark);font-weight:600;">Giỏ hàng</span>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="cart-wrap" id="cartWrap"></div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container-main">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="footer-brand">Phone<span>Store</span></div>
+                <p class="footer-desc">Chuỗi cửa hàng điện thoại & phụ kiện chính hãng uy tín toàn quốc.</p>
+            </div>
+            <div class="col-lg-2 col-md-6 col-6">
+                <div class="footer-heading">Sản phẩm</div>
+                <ul class="footer-links"><li><a href="products.html">Điện thoại</a></li></ul>
+            </div>
+            <div class="col-lg-2 col-md-6 col-6">
+                <div class="footer-heading">Chính sách</div>
+                <ul class="footer-links">
+                    <li><a href="#">Đổi trả hàng</a></li>
+                    <li><a href="#">Bảo hành</a></li>
+                    <li><a href="contact.html">Liên hệ</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <div class="footer-heading">Liên hệ</div>
+                <div class="footer-contact-item"><i class="bi bi-telephone-fill"></i><span>1800 2097</span></div>
+                <div class="footer-contact-item"><i class="bi bi-envelope-fill"></i><span>support@phonestore.com</span></div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 PhoneStore. All rights reserved.</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ═══════════════════════════════════════
+// FAKE DATA — sản phẩm
+// ═══════════════════════════════════════
+const PRODUCTS = [
+    { id:1,  name:'iPhone 15 Pro Max 256GB',         brand:'Apple',   price:32990000, old_price:36990000, stock:5,  image:'assets/images/products/iphone-15-pro-max-256gb-1775315484.jpg' },
+    { id:2,  name:'iPhone 16 Pro 128GB',             brand:'Apple',   price:28990000, old_price:31990000, stock:8,  image:'assets/images/products/iphone-16-pro-128gb-ch-inh-h-ang-vn-a-1775999763.webp' },
+    { id:3,  name:'iPhone 16 128GB',                 brand:'Apple',   price:22990000, old_price:0,        stock:12, image:'assets/images/products/iphone-16-128gb-ch-inh-h-ang-vn-a-1775999533.webp' },
+    { id:4,  name:'iPhone 15 256GB',                 brand:'Apple',   price:19990000, old_price:22990000, stock:6,  image:'assets/images/products/iphone-15-256gb-ch-inh-h-ang-vn-a-1775999446.webp' },
+    { id:5,  name:'iPhone 17 Pro Max 256GB',         brand:'Apple',   price:39990000, old_price:0,        stock:3,  image:'assets/images/products/iphone-17-pro-max-256gb-1776000081.webp' },
+    { id:6,  name:'iPhone 17 Pro 256GB',             brand:'Apple',   price:35990000, old_price:0,        stock:4,  image:'assets/images/products/iphone-17-pro-256gb-1776000031.webp' },
+    { id:7,  name:'iPhone 14 Pro Max 128GB',         brand:'Apple',   price:18990000, old_price:24990000, stock:7,  image:'assets/images/products/iphone-14-pro-max-128gb-ch-inh-h-ang-vn-a-1775999616.webp' },
+    { id:8,  name:'iPhone 16e 128GB',                brand:'Apple',   price:14990000, old_price:0,        stock:10, image:'assets/images/products/iphone-16e-128gb-ch-inh-h-ang-vn-a-1775999716.webp' },
+    { id:9,  name:'Samsung Galaxy S26 Ultra 256GB',  brand:'Samsung', price:34990000, old_price:38990000, stock:5,  image:'assets/images/products/samsung-galaxy-s26-ultra-12gb-256gb-1775912441.webp' },
+    { id:10, name:'Samsung Galaxy S26 256GB',        brand:'Samsung', price:24990000, old_price:0,        stock:8,  image:'assets/images/products/samsung-galaxy-s26-12gb-256gb-1775917176.webp' },
+    { id:11, name:'Samsung Galaxy S25 Ultra 256GB',  brand:'Samsung', price:29990000, old_price:34990000, stock:6,  image:'assets/images/products/samsung-galaxy-s25-ultra-12gb-256gb-1775913779.webp' },
+    { id:12, name:'Samsung Galaxy S25 256GB',        brand:'Samsung', price:19990000, old_price:22990000, stock:9,  image:'assets/images/products/samsung-galaxy-s25-256gb-1775918327.webp' },
+    { id:13, name:'Samsung Galaxy A56 5G 128GB',     brand:'Samsung', price:9990000,  old_price:11990000, stock:15, image:'assets/images/products/samsung-galaxy-a56-5g-8gb-128gb-1775917465.webp' },
+    { id:14, name:'Samsung Galaxy A36 5G 128GB',     brand:'Samsung', price:7990000,  old_price:8990000,  stock:20, image:'assets/images/products/samsung-galaxy-a36-5g-8gb-128gb-1775918179.webp' },
+    { id:15, name:'Samsung Galaxy Z Fold7 256GB',    brand:'Samsung', price:44990000, old_price:0,        stock:2,  image:'assets/images/products/samsung-galaxy-z-fold7-12gb-256gb-1775917309.webp' },
+    { id:16, name:'Samsung Galaxy Z Flip7 256GB',    brand:'Samsung', price:24990000, old_price:0,        stock:4,  image:'assets/images/products/samsung-galaxy-z-flip7-12gb-256gb-1775917584.webp' },
+];
+
+function formatVND(n) { return n.toLocaleString('vi-VN') + 'đ'; }
+
+// ═══════════════════════════════════════
+// RENDER GIỎ HÀNG
+// ═══════════════════════════════════════
+function renderCart() {
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const wrap = document.getElementById('cartWrap');
+
+    // Chưa đăng nhập
+    if (!user.loggedIn) {
+        wrap.style.gridTemplateColumns = '1fr';
+        wrap.innerHTML = `
+            <div class="cart-card">
+                <div class="empty-cart">
+                    <div class="empty-cart-icon">🔐</div>
+                    <h3>Vui lòng đăng nhập</h3>
+                    <p>Bạn cần đăng nhập để xem giỏ hàng.</p>
+                    <a href="login.html" class="btn-shop"><i class="bi bi-person"></i> Đăng nhập ngay</a>
+                </div>
+            </div>`;
+        return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    // Giỏ hàng trống
+    if (cart.length === 0) {
+        wrap.style.gridTemplateColumns = '1fr';
+        wrap.innerHTML = `
+            <div class="cart-card">
+                <div class="empty-cart">
+                    <div class="empty-cart-icon">🛒</div>
+                    <h3>Giỏ hàng trống!</h3>
+                    <p>Bạn chưa có sản phẩm nào trong giỏ hàng.</p>
+                    <a href="products.html" class="btn-shop"><i class="bi bi-bag"></i> Mua sắm ngay</a>
+                </div>
+            </div>`;
+        return;
+    }
+
+    // Có sản phẩm
+    wrap.style.gridTemplateColumns = '1fr 360px';
+
+    // Map cart items với product data
+    const items = cart.map(c => {
+        const p = PRODUCTS.find(pr => pr.id === c.id);
+        if (!p) return null;
+        return { ...p, qty: c.qty };
+    }).filter(Boolean);
+
+    const totalItems = items.reduce((s, i) => s + i.qty, 0);
+
+    // LEFT — danh sách sản phẩm
+    let itemsHTML = items.map(item => `
+        <div class="cart-item" id="cart-item-${item.id}">
+            <input type="checkbox" class="item-check"
+                data-id="${item.id}"
+                data-price="${item.price}"
+                data-qty="${item.qty}"
+                style="width:18px;height:18px;accent-color:var(--primary);cursor:pointer;"
+                checked
+                onchange="recalculate()">
+
+            <a href="product-detail.html?id=${item.id}">
+                <div class="cart-item-img">
+                    <img src="${item.image}" alt="${item.name}"
+                         onerror="this.parentElement.innerHTML='📱'">
+                </div>
+            </a>
+
+            <div class="cart-item-info">
+                <div class="cart-item-brand">${item.brand}</div>
+                <div class="cart-item-name">
+                    <a href="product-detail.html?id=${item.id}">${item.name}</a>
+                </div>
+                <div>
+                    <span class="cart-item-price">${formatVND(item.price)}</span>
+                    ${item.old_price > 0 ? `<span class="cart-item-old">${formatVND(item.old_price)}</span>` : ''}
+                </div>
+            </div>
+
+            <div class="cart-item-actions">
+                <div class="cart-item-subtotal" id="subtotal-${item.id}">
+                    ${formatVND(item.price * item.qty)}
+                </div>
+                <div class="qty-ctrl">
+                    <button onclick="changeQty(${item.id}, -1, ${item.stock})">−</button>
+                    <input type="number" id="qty-${item.id}" value="${item.qty}" min="1" max="${item.stock}"
+                           onchange="onQtyChange(${item.id}, ${item.stock})">
+                    <button onclick="changeQty(${item.id}, 1, ${item.stock})">+</button>
+                </div>
+                <button class="btn-remove" onclick="removeItem(${item.id})">
+                    <i class="bi bi-trash3"></i> Xóa
+                </button>
+            </div>
+        </div>
+    `).join('');
+
+    wrap.innerHTML = `
+        <div>
+            <div class="cart-card">
+                <div class="cart-header">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;">
+                        <input type="checkbox" id="checkAll"
+                            style="width:18px;height:18px;accent-color:var(--primary);cursor:pointer;"
+                            checked onchange="toggleAll(this)">
+                        <span class="cart-title">Giỏ hàng (<span id="totalItemsCount">${totalItems}</span> sản phẩm)</span>
+                    </label>
+                    <button class="btn-clear" onclick="clearCart()">
+                        <i class="bi bi-trash3"></i> Xóa tất cả
+                    </button>
+                </div>
+                ${itemsHTML}
+            </div>
+            <div style="margin-top:12px;">
+                <a href="products.html" style="color:var(--primary);font-size:0.875rem;font-weight:600;text-decoration:none;">
+                    <i class="bi bi-arrow-left"></i> Tiếp tục mua sắm
+                </a>
+            </div>
+        </div>
+
+        <div>
+            <div class="summary-card">
+                <div class="summary-title">Tóm tắt đơn hàng</div>
+                <div id="shippingNote" style="margin-bottom:16px;"></div>
+                <div class="summary-row">
+                    <span class="label">Đã chọn (<span id="selectedCount">0</span> sp)</span>
+                    <span class="value" id="selectedSubtotal">0đ</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Phí vận chuyển</span>
+                    <span class="value" id="shippingFee">30.000đ</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-total">
+                    <span class="label">Tổng cộng</span>
+                    <span class="value" id="grandTotal">0đ</span>
+                </div>
+                <a href="cart.html" class="btn-checkout" id="btnCheckout">
+                    <i class="bi bi-credit-card"></i> Tiến hành thanh toán
+                </a>
+                <a href="products.html" class="btn-continue">
+                    <i class="bi bi-arrow-left"></i> Tiếp tục mua sắm
+                </a>
+            </div>
+        </div>
+    `;
+
+    recalculate();
+}
+
+// ═══════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════
+function changeQty(productId, delta, maxStock) {
+    const input = document.getElementById(`qty-${productId}`);
+    let val = parseInt(input.value) + delta;
+    val = Math.max(1, Math.min(maxStock, val));
+    input.value = val;
+
+    // Update localStorage
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const idx  = cart.findIndex(c => c.id === productId);
+    if (idx > -1) { cart[idx].qty = val; localStorage.setItem('cart', JSON.stringify(cart)); }
+
+    // Update subtotal
+    const p = PRODUCTS.find(pr => pr.id === productId);
+    if (p) document.getElementById(`subtotal-${productId}`).textContent = formatVND(p.price * val);
+
+    // Update checkbox dataset
+    const cb = document.querySelector(`.item-check[data-id="${productId}"]`);
+    if (cb) cb.dataset.qty = val;
+
+    recalculate();
+    updateCartBadge();
+}
+
+function onQtyChange(productId, maxStock) {
+    const input = document.getElementById(`qty-${productId}`);
+    let val = parseInt(input.value) || 1;
+    val = Math.max(1, Math.min(maxStock, val));
+    input.value = val;
+    changeQty(productId, 0, maxStock);
+}
+
+function removeItem(productId) {
+    if (!confirm('Xóa sản phẩm này khỏi giỏ hàng?')) return;
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    cart = cart.filter(c => c.id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartBadge();
+    renderCart();
+}
+
+function clearCart() {
+    if (!confirm('Xóa toàn bộ giỏ hàng?')) return;
+    localStorage.removeItem('cart');
+    updateCartBadge();
+    renderCart();
+}
+
+function toggleAll(checkAll) {
+    document.querySelectorAll('.item-check').forEach(cb => {
+        cb.checked = checkAll.checked;
+    });
+    recalculate();
+}
+
+function recalculate() {
+    const checks = document.querySelectorAll('.item-check');
+    let subtotal = 0, count = 0;
+
+    checks.forEach(cb => {
+        if (cb.checked) {
+            const price = parseInt(cb.dataset.price);
+            const qty   = parseInt(document.getElementById(`qty-${cb.dataset.id}`)?.value || cb.dataset.qty);
+            subtotal += price * qty;
+            count    += qty;
+        }
+    });
+
+    const shippingFee = subtotal >= 500000 ? 0 : (subtotal > 0 ? 30000 : 0);
+    const grandTotal  = subtotal + shippingFee;
+
+    document.getElementById('selectedCount').textContent    = count;
+    document.getElementById('selectedSubtotal').textContent = formatVND(subtotal);
+    document.getElementById('shippingFee').textContent      = shippingFee === 0 && subtotal > 0 ? 'Miễn phí 🎉' : formatVND(shippingFee);
+    document.getElementById('grandTotal').textContent       = formatVND(grandTotal);
+
+    // Shipping note
+    const noteEl = document.getElementById('shippingNote');
+    if (subtotal === 0) {
+        noteEl.innerHTML = '';
+    } else if (shippingFee === 0) {
+        noteEl.innerHTML = `<div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 12px;font-size:0.78rem;color:#16A34A;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <i class="bi bi-truck"></i> Bạn được miễn phí vận chuyển!
+        </div>`;
+    } else {
+        const remain = 500000 - subtotal;
+        noteEl.innerHTML = `<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:10px 12px;font-size:0.78rem;color:#C2410C;font-weight:600;text-align:center;">
+            <i class="bi bi-info-circle"></i> Mua thêm ${formatVND(remain)} để được miễn phí ship!
+        </div>`;
+    }
+
+    // Nút thanh toán
+    const btn = document.getElementById('btnCheckout');
+    if (btn) {
+        if (count > 0) {
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+        } else {
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+        }
+    }
+
+    // Sync checkAll
+    const checkAll = document.getElementById('checkAll');
+    if (checkAll) {
+        const checked = document.querySelectorAll('.item-check:checked').length;
+        checkAll.checked = checked === checks.length;
+        checkAll.indeterminate = checked > 0 && checked < checks.length;
+    }
+}
+
+function updateCartBadge() {
+    const cart  = JSON.parse(localStorage.getItem('cart') || '[]');
+    const total = cart.reduce((s, c) => s + c.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    if (badge) badge.textContent = total;
+}
+
+// Login button
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (user.loggedIn) {
+    document.getElementById('loginBtn').innerHTML = `<i class="bi bi-person-check"></i> ${user.name}`;
+}
+
+// Khởi động
+updateCartBadge();
+renderCart();
+</script>
+</body>
+</html>
