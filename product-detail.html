@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sản phẩm - Phone Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --primary: #0057FF; --primary-dark: #0040CC;
+            --dark: #0A0A0A; --gray: #6B7280;
+            --light: #F8F8F8; --border: #E5E7EB; --danger: #EF4444;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Nunito',sans-serif; background:#f8f9fa; }
+
+        .detail-wrap { max-width:1280px; margin:0 auto; padding:24px; }
+
+        /* BREADCRUMB */
+        .breadcrumb-bar {
+            background:#fff; border-bottom:1px solid var(--border);
+            padding:10px 0; font-size:0.82rem; color:var(--gray);
+        }
+        .breadcrumb-bar a { color:var(--gray); text-decoration:none; }
+        .breadcrumb-bar a:hover { color:var(--primary); }
+
+        /* MAIN DETAIL */
+        .detail-main {
+            display:grid; grid-template-columns:1fr 1fr;
+            gap:40px; background:#fff; border:1px solid var(--border);
+            border-radius:16px; padding:32px; margin-bottom:24px;
+        }
+
+        /* Images */
+        .detail-img-main {
+            width:100%; aspect-ratio:1; background:var(--light);
+            border-radius:12px; overflow:hidden;
+            display:flex; align-items:center; justify-content:center;
+            font-size:8rem; margin-bottom:12px; cursor:zoom-in; position:relative;
+        }
+        .detail-img-main img { width:100%; height:100%; object-fit:cover; transition:transform 0.3s; }
+        .detail-img-main:hover img { transform:scale(1.05); }
+        .detail-img-thumbs { display:flex; gap:8px; flex-wrap:wrap; }
+        .thumb-item {
+            width:68px; height:68px; border:2px solid var(--border);
+            border-radius:8px; overflow:hidden; cursor:pointer;
+            background:var(--light); display:flex; align-items:center;
+            justify-content:center; font-size:1.8rem; transition:border-color 0.2s; flex-shrink:0;
+        }
+        .thumb-item img { width:100%; height:100%; object-fit:cover; }
+        .thumb-item.active, .thumb-item:hover { border-color:var(--primary); }
+
+        /* Info */
+        .detail-brand { font-size:0.75rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
+        .detail-name { font-size:1.5rem; font-weight:800; color:var(--dark); line-height:1.3; margin-bottom:12px; }
+        .detail-rating {
+            display:flex; align-items:center; gap:8px;
+            margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--border);
+        }
+        .stars { color:#F59E0B; font-size:0.9rem; }
+        .rating-num { font-weight:700; color:var(--dark); font-size:0.9rem; }
+        .rating-count { color:var(--gray); font-size:0.85rem; }
+
+        /* Price */
+        .detail-price-wrap { margin-bottom:20px; }
+        .detail-price { font-size:1.8rem; font-weight:800; color:#EF4444; display:block; line-height:1; margin-bottom:6px; }
+        .detail-price-row { display:flex; align-items:center; gap:10px; }
+        .detail-old-price { font-size:1rem; color:var(--gray); text-decoration:line-through; }
+        .detail-discount-badge {
+            background:#FEF2F2; color:#EF4444; border:1px solid #FECACA;
+            font-size:0.8rem; font-weight:700; padding:3px 10px; border-radius:100px;
+        }
+
+        /* Variants */
+        .detail-variants { margin-bottom:20px; }
+        .variant-label { font-size:0.82rem; font-weight:700; color:var(--dark); margin-bottom:8px; }
+        .variant-options { display:flex; gap:8px; flex-wrap:wrap; }
+        .variant-btn {
+            padding:6px 14px; border:1.5px solid var(--border); border-radius:8px;
+            font-size:0.82rem; font-weight:600; color:var(--dark);
+            background:#fff; cursor:pointer; transition:all 0.2s; font-family:'Nunito',sans-serif;
+        }
+        .variant-btn:hover, .variant-btn.active { border-color:var(--primary); color:var(--primary); background:#EEF4FF; }
+
+        /* Quantity */
+        .qty-wrap { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+        .qty-label { font-size:0.82rem; font-weight:700; color:var(--dark); }
+        .qty-control { display:flex; align-items:center; border:1.5px solid var(--border); border-radius:10px; overflow:hidden; }
+        .qty-btn {
+            width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+            background:var(--light); border:none; cursor:pointer; font-size:1.1rem; color:var(--dark); transition:background 0.2s;
+        }
+        .qty-btn:hover { background:#e0e0e0; }
+        .qty-input {
+            width:48px; height:36px; border:none;
+            border-left:1.5px solid var(--border); border-right:1.5px solid var(--border);
+            text-align:center; font-size:0.9rem; font-weight:700;
+            font-family:'Nunito',sans-serif; outline:none;
+        }
+        .qty-stock { font-size:0.8rem; color:var(--gray); }
+        .qty-stock span { color:#16A34A; font-weight:700; }
+
+        /* Actions */
+        .detail-actions { display:flex; gap:10px; margin-bottom:20px; }
+        .btn-buy-now {
+            flex:1; background:#EF4444; color:#fff; border:none; border-radius:10px;
+            padding:13px; font-size:0.95rem; font-weight:700; font-family:'Nunito',sans-serif;
+            cursor:pointer; transition:all 0.2s; text-decoration:none;
+            display:flex; align-items:center; justify-content:center; gap:6px;
+        }
+        .btn-buy-now:hover { background:#DC2626; color:#fff; transform:translateY(-1px); }
+        .btn-add-cart-detail {
+            flex:1; background:var(--primary); color:#fff; border:none; border-radius:10px;
+            padding:13px; font-size:0.95rem; font-weight:700; font-family:'Nunito',sans-serif;
+            cursor:pointer; transition:all 0.2s; text-decoration:none;
+            display:flex; align-items:center; justify-content:center; gap:6px;
+        }
+        .btn-add-cart-detail:hover { background:var(--primary-dark); color:#fff; transform:translateY(-1px); }
+
+        /* Guarantees */
+        .detail-guarantees { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .guarantee-item {
+            display:flex; align-items:center; gap:8px;
+            background:var(--light); border-radius:8px; padding:8px 10px;
+            font-size:0.78rem; font-weight:600; color:var(--dark);
+        }
+        .guarantee-item i { color:#16A34A; font-size:1rem; }
+
+        /* TABS */
+        .detail-tabs { background:#fff; border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:24px; }
+        .tab-nav { display:flex; border-bottom:1px solid var(--border); }
+        .tab-btn {
+            padding:16px 28px; font-size:0.9rem; font-weight:700; color:var(--gray);
+            background:none; border:none; border-bottom:2px solid transparent;
+            cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s; margin-bottom:-1px;
+        }
+        .tab-btn.active { color:var(--primary); border-bottom-color:var(--primary); }
+        .tab-btn:hover { color:var(--primary); }
+        .tab-content { padding:28px; }
+        .tab-pane { display:none; }
+        .tab-pane.active { display:block; }
+        .tab-pane p { font-size:0.9rem; line-height:1.8; color:#374151; margin-bottom:12px; }
+        .specs-table { width:100%; border-collapse:collapse; }
+        .specs-table tr:nth-child(even) { background:var(--light); }
+        .specs-table td { padding:10px 14px; font-size:0.875rem; border:1px solid var(--border); }
+        .specs-table td:first-child { font-weight:700; color:var(--dark); width:35%; background:#F9FAFB; }
+        .specs-table td:last-child { color:#374151; }
+
+        /* REVIEWS */
+        .reviews-section { background:#fff; border:1px solid var(--border); border-radius:16px; padding:28px; margin-bottom:24px; }
+        .reviews-section-title { font-size:1.1rem; font-weight:800; color:var(--dark); margin-bottom:24px; display:flex; align-items:center; gap:8px; }
+        .reviews-section-title::before { content:''; display:inline-block; width:4px; height:18px; background:var(--primary); border-radius:2px; }
+        .rating-summary { display:grid; grid-template-columns:auto 1fr; gap:24px; align-items:center; padding:20px; background:var(--light); border-radius:12px; margin-bottom:24px; }
+        .rating-big { text-align:center; padding-right:24px; border-right:1px solid var(--border); }
+        .rating-big-num { font-size:3rem; font-weight:800; color:var(--dark); line-height:1; }
+        .rating-big-stars { color:#F59E0B; font-size:1.1rem; margin:6px 0; }
+        .rating-big-count { font-size:0.8rem; color:var(--gray); }
+        .rating-bars { display:flex; flex-direction:column; gap:6px; }
+        .rating-bar-row { display:flex; align-items:center; gap:8px; font-size:0.8rem; }
+        .rating-bar-label { color:var(--gray); white-space:nowrap; width:24px; text-align:right; }
+        .rating-bar-track { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+        .rating-bar-fill { height:100%; background:#F59E0B; border-radius:3px; }
+        .rating-bar-count { color:var(--gray); width:20px; }
+
+        /* Review form */
+        .review-form-wrap { background:var(--light); border-radius:12px; padding:20px; margin-bottom:24px; }
+        .review-form-title { font-weight:700; font-size:0.9rem; color:var(--dark); margin-bottom:14px; }
+        .star-picker { display:flex; gap:4px; margin-bottom:14px; }
+        .star-picker i { font-size:1.6rem; color:var(--border); cursor:pointer; transition:color 0.15s; }
+        .star-picker i.active { color:#F59E0B; }
+        .review-textarea {
+            width:100%; background:#fff; border:1.5px solid var(--border);
+            border-radius:10px; padding:12px; font-size:0.875rem;
+            font-family:'Nunito',sans-serif; resize:vertical; min-height:100px;
+            outline:none; transition:border-color 0.2s;
+        }
+        .review-textarea:focus { border-color:var(--primary); }
+        .btn-review-submit {
+            background:var(--primary); color:#fff; border:none; border-radius:8px;
+            padding:10px 24px; font-size:0.875rem; font-weight:700;
+            font-family:'Nunito',sans-serif; cursor:pointer; margin-top:10px; transition:background 0.2s;
+        }
+        .btn-review-submit:hover { background:var(--primary-dark); }
+
+        /* Review items */
+        .review-item { padding:16px 0; border-bottom:1px solid var(--border); }
+        .review-item:last-child { border-bottom:none; }
+        .review-header { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+        .reviewer-avatar {
+            width:36px; height:36px; background:#EEF4FF; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.85rem; font-weight:700; color:var(--primary); flex-shrink:0;
+        }
+        .reviewer-name { font-weight:700; font-size:0.875rem; color:var(--dark); }
+        .review-date { font-size:0.75rem; color:var(--gray); margin-left:auto; }
+        .review-stars { color:#F59E0B; font-size:0.82rem; margin-bottom:6px; }
+        .review-comment { font-size:0.875rem; color:#374151; line-height:1.6; }
+
+        /* RELATED */
+        .related-section { background:#fff; border:1px solid var(--border); border-radius:16px; padding:28px; }
+        .related-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:20px; }
+        .r-card { border:1px solid var(--border); border-radius:10px; overflow:hidden; transition:all 0.2s; text-decoration:none; color:inherit; display:block; }
+        .r-card:hover { border-color:var(--primary); transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,87,255,0.08); }
+        .r-img { width:100%; aspect-ratio:1; background:var(--light); display:flex; align-items:center; justify-content:center; font-size:3rem; overflow:hidden; }
+        .r-img img { width:100%; height:100%; object-fit:cover; }
+        .r-body { padding:10px; }
+        .r-name { font-size:0.82rem; font-weight:700; color:var(--dark); margin-bottom:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .r-price { font-size:0.9rem; font-weight:800; color:#EF4444; }
+
+        /* ALERTS */
+        .alert-success-sm { background:#F0FDF4; border:1px solid #BBF7D0; color:#16A34A; border-radius:8px; padding:10px 14px; font-size:0.85rem; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+        .alert-error-sm { background:#FEF2F2; border:1px solid #FECACA; color:#DC2626; border-radius:8px; padding:10px 14px; font-size:0.85rem; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+
+        /* CART BADGE */
+        .cart-badge { background:var(--danger); color:#fff; font-size:0.65rem; font-weight:700; padding:2px 6px; border-radius:100px; margin-left:4px; }
+
+        @media(max-width:900px) { .detail-main{grid-template-columns:1fr;gap:24px;} .related-grid{grid-template-columns:repeat(2,1fr);} }
+        @media(max-width:600px) { .detail-wrap{padding:12px;} .detail-main{padding:16px;} .detail-name{font-size:1.2rem;} .detail-price{font-size:1.4rem;} .detail-actions{flex-direction:column;} .rating-summary{grid-template-columns:1fr;} .rating-big{border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:16px;} }
+
+        @keyframes slideUp { from{transform:translateY(20px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <span class="topbar-item"><i class="bi bi-shield-check"></i> Hàng chính hãng 100%</span>
+        <span class="topbar-item"><i class="bi bi-truck"></i> Miễn phí ship đơn từ 500K</span>
+        <span class="topbar-item"><i class="bi bi-arrow-repeat"></i> Đổi trả trong 30 ngày</span>
+        <span class="topbar-item"><i class="bi bi-headset"></i> Hotline: 1800 2097</span>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="navbar-brand">Phone<span>Store</span></a>
+        <div class="search-wrap" style="position:relative;flex:1;max-width:480px;margin:0 24px;">
+            <input type="text" id="searchInput" placeholder="Bạn muốn tìm gì hôm nay?" autocomplete="off">
+            <button class="search-btn"><i class="bi bi-search"></i></button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="products.html"><i class="bi bi-phone"></i> Sản phẩm</a></li>
+            <li><a href="#"><i class="bi bi-shield-check"></i> Chính sách</a></li>
+            <li><a href="contact.html"><i class="bi bi-headset"></i> Liên hệ</a></li>
+        </ul>
+        <a href="cart.html" class="cart-link">
+            <i class="bi bi-bag" style="font-size:1.1rem"></i> Giỏ hàng
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <a href="login.html" class="btn-login" id="loginBtn">
+            <i class="bi bi-person"></i> Đăng nhập
+        </a>
+    </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+    <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
+        <a href="index.html">Trang chủ</a>
+        <i class="bi bi-chevron-right" style="font-size:0.7rem;margin:0 6px;"></i>
+        <a href="products.html">Sản phẩm</a>
+        <i class="bi bi-chevron-right" style="font-size:0.7rem;margin:0 6px;"></i>
+        <span style="color:var(--dark);font-weight:600;" id="breadcrumbName">Đang tải...</span>
+    </div>
+</div>
+
+<div class="detail-wrap">
+
+    <!-- MAIN DETAIL -->
+    <div class="detail-main">
+        <!-- LEFT — Images -->
+        <div>
+            <div class="detail-img-main" id="mainImgWrap">
+                <img src="" alt="" id="mainImgEl" onerror="this.parentElement.innerHTML='📱'">
+            </div>
+            <div class="detail-img-thumbs" id="thumbs"></div>
+        </div>
+
+        <!-- RIGHT — Info -->
+        <div>
+            <div class="detail-brand" id="detailBrand"></div>
+            <h1 class="detail-name" id="detailName"></h1>
+
+            <div class="detail-rating">
+                <div class="stars" id="detailStars"></div>
+                <span class="rating-num" id="detailRatingNum"></span>
+                <span class="rating-count" id="detailRatingCount"></span>
+                <span id="stockBadge" style="margin-left:auto;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:100px;"></span>
+            </div>
+
+            <div class="detail-price-wrap">
+                <span class="detail-price" id="detailPrice"></span>
+                <div class="detail-price-row" id="detailPriceRow"></div>
+            </div>
+
+            <div class="detail-variants" id="ramVariants" style="display:none">
+                <div class="variant-label">RAM</div>
+                <div class="variant-options" id="ramOptions"></div>
+            </div>
+
+            <div class="detail-variants" id="storageVariants" style="display:none">
+                <div class="variant-label">Bộ nhớ</div>
+                <div class="variant-options" id="storageOptions"></div>
+            </div>
+
+            <div class="qty-wrap">
+                <span class="qty-label">Số lượng</span>
+                <div class="qty-control">
+                    <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                    <input type="number" class="qty-input" id="qtyInput" value="1" min="1">
+                    <button class="qty-btn" onclick="changeQty(1)">+</button>
+                </div>
+                <span class="qty-stock">Kho: <span id="stockNum">0</span></span>
+            </div>
+
+            <div class="detail-actions" id="detailActions"></div>
+
+            <div class="detail-guarantees">
+                <div class="guarantee-item"><i class="bi bi-patch-check-fill"></i> Hàng chính hãng 100%</div>
+                <div class="guarantee-item"><i class="bi bi-shield-fill-check"></i> Bảo hành 12 tháng</div>
+                <div class="guarantee-item"><i class="bi bi-arrow-repeat"></i> Đổi trả trong 30 ngày</div>
+                <div class="guarantee-item"><i class="bi bi-truck"></i> Miễn phí vận chuyển</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="detail-tabs">
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab(this,'tab-desc')">
+                <i class="bi bi-file-text"></i> Mô tả sản phẩm
+            </button>
+            <button class="tab-btn" onclick="switchTab(this,'tab-specs')">
+                <i class="bi bi-list-columns"></i> Thông số kỹ thuật
+            </button>
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab-desc">
+                <div class="product-description" id="tabDesc"></div>
+            </div>
+            <div class="tab-pane" id="tab-specs">
+                <table class="specs-table" id="specsTable"></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="reviews-section">
+        <div class="reviews-section-title">Đánh giá & Bình luận</div>
+        <div class="rating-summary">
+            <div class="rating-big">
+                <div class="rating-big-num" id="avgRating">4.5</div>
+                <div class="rating-big-stars" id="avgStars"></div>
+                <div class="rating-big-count" id="reviewCount"></div>
+            </div>
+            <div class="rating-bars" id="ratingBars"></div>
+        </div>
+
+        <!-- Form đánh giá -->
+        <div class="review-form-wrap" id="reviewFormWrap">
+            <div class="review-form-title">✍️ Viết đánh giá của bạn</div>
+            <div id="reviewAlert"></div>
+            <div style="font-size:0.82rem;font-weight:700;color:var(--dark);margin-bottom:6px;">Chọn số sao</div>
+            <div class="star-picker" id="starPicker">
+                <i class="bi bi-star-fill" data-star="1" onclick="setStar(1)"></i>
+                <i class="bi bi-star-fill" data-star="2" onclick="setStar(2)"></i>
+                <i class="bi bi-star-fill" data-star="3" onclick="setStar(3)"></i>
+                <i class="bi bi-star-fill" data-star="4" onclick="setStar(4)"></i>
+                <i class="bi bi-star-fill" data-star="5" onclick="setStar(5)"></i>
+            </div>
+            <textarea class="review-textarea" id="reviewComment" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."></textarea>
+            <button class="btn-review-submit" onclick="submitReview()">
+                <i class="bi bi-send-fill"></i> Gửi đánh giá
+            </button>
+        </div>
+
+        <!-- Danh sách đánh giá -->
+        <div id="reviewList"></div>
+    </div>
+
+    <!-- RELATED -->
+    <div class="related-section">
+        <div class="reviews-section-title">Sản phẩm liên quan</div>
+        <div class="related-grid" id="relatedGrid"></div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container-main">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="footer-brand">Phone<span>Store</span></div>
+                <p class="footer-desc">Chuỗi cửa hàng điện thoại & phụ kiện chính hãng uy tín toàn quốc.</p>
+            </div>
+            <div class="col-lg-2 col-md-6 col-6">
+                <div class="footer-heading">Sản phẩm</div>
+                <ul class="footer-links"><li><a href="products.html">Điện thoại</a></li></ul>
+            </div>
+            <div class="col-lg-2 col-md-6 col-6">
+                <div class="footer-heading">Chính sách</div>
+                <ul class="footer-links">
+                    <li><a href="#">Đổi trả hàng</a></li>
+                    <li><a href="#">Bảo hành</a></li>
+                    <li><a href="contact.html">Liên hệ</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <div class="footer-heading">Liên hệ</div>
+                <div class="footer-contact-item"><i class="bi bi-telephone-fill"></i><span>1800 2097</span></div>
+                <div class="footer-contact-item"><i class="bi bi-envelope-fill"></i><span>support@phonestore.com</span></div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 PhoneStore. All rights reserved.</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ═══════════════════════════════════════
+// FAKE DATA
+// ═══════════════════════════════════════
+const PRODUCTS = [
+    { id:1,  name:'iPhone 15 Pro Max 256GB', brand:'Apple',   category:'dien-thoai', price:32990000, old_price:36990000, discount:10, ram:'8GB',  storage:'256GB', stock:5,  image:'assets/images/products/iphone-15-pro-max-256gb-1775315484.jpg',
+      description:'iPhone 15 Pro Max là chiếc iPhone mạnh mẽ nhất từ trước đến nay. Với chip A17 Pro, camera 48MP và thiết kế titan cao cấp, đây là lựa chọn hoàn hảo cho những ai muốn trải nghiệm tốt nhất.',
+      specs:{ 'Màn hình':'6.7 inch Super Retina XDR', 'Chip':'A17 Pro', 'Camera sau':'48MP + 12MP + 12MP', 'Camera trước':'12MP TrueDepth', 'Pin':'4422 mAh', 'Hệ điều hành':'iOS 17', 'Kết nối':'5G, Wi-Fi 6E, Bluetooth 5.3' }
+    },
+    { id:2,  name:'iPhone 16 Pro 128GB',     brand:'Apple',   category:'dien-thoai', price:28990000, old_price:31990000, discount:9,  ram:'8GB',  storage:'128GB', stock:8,  image:'assets/images/products/iphone-16-pro-128gb-ch-inh-h-ang-vn-a-1775999763.webp',
+      description:'iPhone 16 Pro với chip A18 Pro mạnh mẽ, camera 48MP thế hệ mới và màn hình ProMotion 120Hz siêu mượt.',
+      specs:{ 'Màn hình':'6.3 inch Super Retina XDR 120Hz', 'Chip':'A18 Pro', 'Camera sau':'48MP + 48MP + 12MP', 'Camera trước':'12MP', 'Pin':'3582 mAh', 'Hệ điều hành':'iOS 18', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.3' }
+    },
+    { id:3,  name:'iPhone 16 128GB',         brand:'Apple',   category:'dien-thoai', price:22990000, old_price:0,        discount:0,  ram:'8GB',  storage:'128GB', stock:12, image:'assets/images/products/iphone-16-128gb-ch-inh-h-ang-vn-a-1775999533.webp',
+      description:'iPhone 16 tiêu chuẩn với chip A18, nút Action mới và camera được nâng cấp đáng kể so với thế hệ trước.',
+      specs:{ 'Màn hình':'6.1 inch Super Retina XDR', 'Chip':'A18', 'Camera sau':'48MP + 12MP', 'Camera trước':'12MP', 'Pin':'3561 mAh', 'Hệ điều hành':'iOS 18', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.3' }
+    },
+    { id:4,  name:'iPhone 15 256GB',         brand:'Apple',   category:'dien-thoai', price:19990000, old_price:22990000, discount:13, ram:'6GB',  storage:'256GB', stock:6,  image:'assets/images/products/iphone-15-256gb-ch-inh-h-ang-vn-a-1775999446.webp',
+      description:'iPhone 15 với cổng USB-C lần đầu tiên, chip A16 Bionic và camera chính 48MP.',
+      specs:{ 'Màn hình':'6.1 inch Super Retina XDR', 'Chip':'A16 Bionic', 'Camera sau':'48MP + 12MP', 'Camera trước':'12MP TrueDepth', 'Pin':'3877 mAh', 'Hệ điều hành':'iOS 17', 'Kết nối':'5G, Wi-Fi 6, Bluetooth 5.3' }
+    },
+    { id:5,  name:'iPhone 17 Pro Max 256GB', brand:'Apple',   category:'dien-thoai', price:39990000, old_price:0,        discount:0,  ram:'12GB', storage:'256GB', stock:3,  image:'assets/images/products/iphone-17-pro-max-256gb-1776000081.webp',
+      description:'iPhone 17 Pro Max — đỉnh cao công nghệ Apple 2025 với chip A19 Pro, camera 200MP và pin siêu bền.',
+      specs:{ 'Màn hình':'6.9 inch ProMotion XDR 120Hz', 'Chip':'A19 Pro', 'Camera sau':'200MP + 48MP + 48MP', 'Camera trước':'24MP', 'Pin':'5000 mAh', 'Hệ điều hành':'iOS 19', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.4' }
+    },
+    { id:6,  name:'iPhone 17 Pro 256GB',     brand:'Apple',   category:'dien-thoai', price:35990000, old_price:0,        discount:0,  ram:'12GB', storage:'256GB', stock:4,  image:'assets/images/products/iphone-17-pro-256gb-1776000031.webp',
+      description:'iPhone 17 Pro với chip A19 Pro và thiết kế mỏng nhất trong lịch sử iPhone.',
+      specs:{ 'Màn hình':'6.3 inch ProMotion XDR 120Hz', 'Chip':'A19 Pro', 'Camera sau':'200MP + 48MP + 12MP', 'Camera trước':'24MP', 'Pin':'4200 mAh', 'Hệ điều hành':'iOS 19', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.4' }
+    },
+    { id:7,  name:'iPhone 14 Pro Max 128GB', brand:'Apple',   category:'dien-thoai', price:18990000, old_price:24990000, discount:24, ram:'6GB',  storage:'128GB', stock:7,  image:'assets/images/products/iphone-14-pro-max-128gb-ch-inh-h-ang-vn-a-1775999616.webp',
+      description:'iPhone 14 Pro Max với Dynamic Island độc đáo, chip A16 Bionic và camera 48MP.',
+      specs:{ 'Màn hình':'6.7 inch ProMotion XDR 120Hz', 'Chip':'A16 Bionic', 'Camera sau':'48MP + 12MP + 12MP', 'Camera trước':'12MP TrueDepth', 'Pin':'4323 mAh', 'Hệ điều hành':'iOS 16', 'Kết nối':'5G, Wi-Fi 6, Bluetooth 5.3' }
+    },
+    { id:8,  name:'iPhone 16e 128GB',        brand:'Apple',   category:'dien-thoai', price:14990000, old_price:0,        discount:0,  ram:'6GB',  storage:'128GB', stock:10, image:'assets/images/products/iphone-16e-128gb-ch-inh-h-ang-vn-a-1775999716.webp',
+      description:'iPhone 16e — lựa chọn giá tốt nhất của Apple 2025, chip A16 mạnh mẽ, thiết kế gọn nhẹ.',
+      specs:{ 'Màn hình':'6.1 inch Liquid Retina', 'Chip':'A16 Bionic', 'Camera sau':'48MP', 'Camera trước':'12MP', 'Pin':'3279 mAh', 'Hệ điều hành':'iOS 18', 'Kết nối':'5G, Wi-Fi 6, Bluetooth 5.3' }
+    },
+    { id:9,  name:'Samsung Galaxy S26 Ultra 256GB', brand:'Samsung', category:'dien-thoai', price:34990000, old_price:38990000, discount:10, ram:'12GB', storage:'256GB', stock:5, image:'assets/images/products/samsung-galaxy-s26-ultra-12gb-256gb-1775912441.webp',
+      description:'Samsung Galaxy S26 Ultra với bút S Pen tích hợp, camera 200MP và chip Snapdragon 8 Elite thế hệ 2.',
+      specs:{ 'Màn hình':'6.9 inch Dynamic AMOLED 2X 120Hz', 'Chip':'Snapdragon 8 Elite 2', 'Camera sau':'200MP + 50MP + 10MP + 50MP', 'Camera trước':'12MP', 'Pin':'5000 mAh', 'Hệ điều hành':'Android 15 / One UI 7', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.4' }
+    },
+    { id:10, name:'Samsung Galaxy S26 256GB', brand:'Samsung', category:'dien-thoai', price:24990000, old_price:0, discount:0, ram:'12GB', storage:'256GB', stock:8, image:'assets/images/products/samsung-galaxy-s26-12gb-256gb-1775917176.webp',
+      description:'Samsung Galaxy S26 tiêu chuẩn, thiết kế mỏng nhẹ với chip Snapdragon 8 Elite thế hệ 2.',
+      specs:{ 'Màn hình':'6.2 inch Dynamic AMOLED 2X 120Hz', 'Chip':'Snapdragon 8 Elite 2', 'Camera sau':'50MP + 12MP + 10MP', 'Camera trước':'12MP', 'Pin':'4000 mAh', 'Hệ điều hành':'Android 15 / One UI 7', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.4' }
+    },
+    { id:11, name:'Samsung Galaxy S25 Ultra 256GB', brand:'Samsung', category:'dien-thoai', price:29990000, old_price:34990000, discount:14, ram:'12GB', storage:'256GB', stock:6, image:'assets/images/products/samsung-galaxy-s25-ultra-12gb-256gb-1775913779.webp',
+      description:'Samsung Galaxy S25 Ultra với S Pen, AI Galaxy và chip Snapdragon 8 Elite.',
+      specs:{ 'Màn hình':'6.9 inch Dynamic AMOLED 2X 120Hz', 'Chip':'Snapdragon 8 Elite', 'Camera sau':'200MP + 50MP + 10MP + 50MP', 'Camera trước':'12MP', 'Pin':'5000 mAh', 'Hệ điều hành':'Android 15 / One UI 7', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.4' }
+    },
+    { id:12, name:'Samsung Galaxy S25 256GB', brand:'Samsung', category:'dien-thoai', price:19990000, old_price:22990000, discount:13, ram:'12GB', storage:'256GB', stock:9, image:'assets/images/products/samsung-galaxy-s25-256gb-1775918327.webp',
+      description:'Samsung Galaxy S25 với AI Galaxy, thiết kế sang trọng và chip Snapdragon 8 Elite.',
+      specs:{ 'Màn hình':'6.2 inch Dynamic AMOLED 2X 120Hz', 'Chip':'Snapdragon 8 Elite', 'Camera sau':'50MP + 12MP + 10MP', 'Camera trước':'12MP', 'Pin':'4000 mAh', 'Hệ điều hành':'Android 15 / One UI 7', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.4' }
+    },
+    { id:13, name:'Samsung Galaxy A56 5G 128GB', brand:'Samsung', category:'dien-thoai', price:9990000, old_price:11990000, discount:17, ram:'8GB', storage:'128GB', stock:15, image:'assets/images/products/samsung-galaxy-a56-5g-8gb-128gb-1775917465.webp',
+      description:'Samsung Galaxy A56 5G tầm trung cao cấp, màn hình Super AMOLED và camera 50MP.',
+      specs:{ 'Màn hình':'6.7 inch Super AMOLED 120Hz', 'Chip':'Exynos 1580', 'Camera sau':'50MP + 12MP + 5MP', 'Camera trước':'12MP', 'Pin':'5000 mAh', 'Hệ điều hành':'Android 15 / One UI 7', 'Kết nối':'5G, Wi-Fi 6, Bluetooth 5.3' }
+    },
+    { id:14, name:'Samsung Galaxy A36 5G 128GB', brand:'Samsung', category:'dien-thoai', price:7990000, old_price:8990000, discount:11, ram:'8GB', storage:'128GB', stock:20, image:'assets/images/products/samsung-galaxy-a36-5g-8gb-128gb-1775918179.webp',
+      description:'Samsung Galaxy A36 5G giá hợp lý, hiệu năng tốt với chip Snapdragon 6 Gen 3.',
+      specs:{ 'Màn hình':'6.7 inch Super AMOLED 120Hz', 'Chip':'Snapdragon 6 Gen 3', 'Camera sau':'50MP + 8MP + 5MP', 'Camera trước':'12MP', 'Pin':'5000 mAh', 'Hệ điều hành':'Android 15 / One UI 7', 'Kết nối':'5G, Wi-Fi 6, Bluetooth 5.3' }
+    },
+    { id:15, name:'Samsung Galaxy Z Fold7 256GB', brand:'Samsung', category:'dien-thoai', price:44990000, old_price:0, discount:0, ram:'12GB', storage:'256GB', stock:2, image:'assets/images/products/samsung-galaxy-z-fold7-12gb-256gb-1775917309.webp',
+      description:'Samsung Galaxy Z Fold7 — điện thoại gập cao cấp nhất, màn hình trong 7.9 inch.',
+      specs:{ 'Màn hình':'7.9 inch Dynamic AMOLED 2X / 6.5 inch ngoài', 'Chip':'Snapdragon 8 Elite 2', 'Camera sau':'200MP + 12MP + 10MP', 'Camera trước':'10MP / 4MP', 'Pin':'4400 mAh', 'Hệ điều hành':'Android 15 / One UI 7', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.4' }
+    },
+    { id:16, name:'Samsung Galaxy Z Flip7 256GB', brand:'Samsung', category:'dien-thoai', price:24990000, old_price:0, discount:0, ram:'12GB', storage:'256GB', stock:4, image:'assets/images/products/samsung-galaxy-z-flip7-12gb-256gb-1775917584.webp',
+      description:'Samsung Galaxy Z Flip7 thiết kế gập nhỏ gọn, màn hình ngoài lớn hơn và pin cải thiện.',
+      specs:{ 'Màn hình':'6.9 inch Dynamic AMOLED 2X / 4.0 inch ngoài', 'Chip':'Snapdragon 8 Elite 2', 'Camera sau':'50MP + 12MP', 'Camera trước':'10MP', 'Pin':'4100 mAh', 'Hệ điều hành':'Android 15 / One UI 7', 'Kết nối':'5G, Wi-Fi 7, Bluetooth 5.4' }
+    },
+];
+
+// Fake reviews
+const FAKE_REVIEWS = [
+    { name:'Nguyễn Văn A', rating:5, comment:'Sản phẩm rất tốt, giao hàng nhanh, đóng gói cẩn thận. Mình rất hài lòng!', date:'01/05/2026' },
+    { name:'Trần Thị B',   rating:4, comment:'Máy chạy mượt, camera chụp đẹp. Chỉ tiếc pin hơi yếu một chút.', date:'28/04/2026' },
+    { name:'Lê Văn C',     rating:5, comment:'Mua lần 2 rồi, chất lượng luôn ổn định. Shop tư vấn nhiệt tình!', date:'25/04/2026' },
+];
+
+let selectedRating = 0;
+let currentProduct = null;
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+    // Lấy id từ URL
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get('id')) || 1;
+    const p  = PRODUCTS.find(pr => pr.id === id) || PRODUCTS[0];
+    currentProduct = p;
+
+    // Breadcrumb
+    document.getElementById('breadcrumbName').textContent = p.name;
+    document.title = p.name + ' - Phone Store';
+
+    // Image
+    document.getElementById('mainImgEl').src = p.image;
+    document.getElementById('mainImgEl').alt = p.name;
+    document.getElementById('thumbs').innerHTML = `
+        <div class="thumb-item active" onclick="switchImg(this,'${p.image}')">
+            <img src="${p.image}" alt="" onerror="this.parentElement.innerHTML='📱'">
+        </div>
+    `;
+
+    // Info
+    document.getElementById('detailBrand').textContent = p.brand;
+    document.getElementById('detailName').textContent  = p.name;
+
+    // Rating (fake)
+    const avg = 4.5;
+    document.getElementById('detailStars').innerHTML = renderStars(avg);
+    document.getElementById('detailRatingNum').textContent   = avg;
+    document.getElementById('detailRatingCount').textContent = `(${FAKE_REVIEWS.length} đánh giá)`;
+
+    // Stock badge
+    const badge = document.getElementById('stockBadge');
+    if (p.stock > 0) {
+        badge.style.cssText = 'background:#F0FDF4;color:#16A34A;border:1px solid #BBF7D0;';
+        badge.innerHTML = '<i class="bi bi-check-circle-fill"></i> Còn hàng';
+    } else {
+        badge.style.cssText = 'background:#FEF2F2;color:#EF4444;border:1px solid #FECACA;';
+        badge.textContent = 'Hết hàng';
+    }
+
+    // Price
+    document.getElementById('detailPrice').textContent = formatPrice(p.price);
+    const priceRow = document.getElementById('detailPriceRow');
+    if (p.old_price > 0) {
+        priceRow.innerHTML = `
+            <span class="detail-old-price">${formatPrice(p.old_price)}</span>
+            ${p.discount > 0 ? `<span class="detail-discount-badge">Tiết kiệm ${p.discount}%</span>` : ''}
+        `;
+    }
+
+    // RAM
+    if (p.ram) {
+        document.getElementById('ramVariants').style.display = 'block';
+        document.getElementById('ramOptions').innerHTML = `<button class="variant-btn active">${p.ram}</button>`;
+    }
+
+    // Storage
+    if (p.storage) {
+        document.getElementById('storageVariants').style.display = 'block';
+        document.getElementById('storageOptions').innerHTML = `<button class="variant-btn active">${p.storage}</button>`;
+    }
+
+    // Qty max
+    document.getElementById('qtyInput').max = p.stock;
+    document.getElementById('stockNum').textContent = p.stock;
+
+    // Actions
+    const actions = document.getElementById('detailActions');
+    if (p.stock > 0) {
+        actions.innerHTML = `
+            <button class="btn-add-cart-detail" onclick="addToCart(${p.id})">
+                <i class="bi bi-bag-plus"></i> Thêm vào giỏ
+            </button>
+            <button class="btn-buy-now" onclick="buyNow(${p.id})">
+                <i class="bi bi-lightning-fill"></i> Mua ngay
+            </button>
+        `;
+    } else {
+        actions.innerHTML = `
+            <button class="btn-add-cart-detail" disabled style="background:#E5E7EB;color:#9CA3AF;cursor:not-allowed;">
+                <i class="bi bi-x-circle"></i> Hết hàng
+            </button>
+        `;
+    }
+
+    // Description tab
+    document.getElementById('tabDesc').innerHTML = `<p style="line-height:1.8;color:#374151;">${p.description}</p>`;
+
+    // Specs tab
+    const specs = p.specs || {};
+    let specsHTML = `
+        <tr><td>Thương hiệu</td><td>${p.brand}</td></tr>
+        <tr><td>Danh mục</td><td>Điện thoại</td></tr>
+        ${p.ram ? `<tr><td>RAM</td><td>${p.ram}</td></tr>` : ''}
+        ${p.storage ? `<tr><td>Bộ nhớ trong</td><td>${p.storage}</td></tr>` : ''}
+        <tr><td>Tình trạng</td><td>${p.stock > 0 ? `<span style='color:#16A34A;font-weight:700'>Còn hàng (${p.stock})</span>` : `<span style='color:#EF4444;font-weight:700'>Hết hàng</span>`}</td></tr>
+        <tr><td>Giá bán</td><td><strong style="color:#EF4444">${formatPrice(p.price)}</strong></td></tr>
+        ${p.old_price > 0 ? `<tr><td>Giá gốc</td><td><s>${formatPrice(p.old_price)}</s></td></tr>` : ''}
+    `;
+    Object.entries(specs).forEach(([k, v]) => {
+        specsHTML += `<tr><td>${k}</td><td>${v}</td></tr>`;
+    });
+    document.getElementById('specsTable').innerHTML = specsHTML;
+
+    // Reviews
+    renderReviews();
+
+    // Related
+    renderRelated(p);
+
+    // Login button
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (user.loggedIn) {
+        document.getElementById('loginBtn').innerHTML = `<i class="bi bi-person-check"></i> ${user.name}`;
+    } else {
+        // Ẩn form review nếu chưa đăng nhập
+        document.getElementById('reviewFormWrap').innerHTML = `
+            <div style="background:var(--light);border-radius:10px;padding:16px;text-align:center;font-size:0.875rem;color:var(--gray);">
+                <a href="login.html" style="color:var(--primary);font-weight:700;">Đăng nhập</a> để viết đánh giá sản phẩm
+            </div>
+        `;
+    }
+
+    updateCartBadge();
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function formatPrice(p) { return p.toLocaleString('vi-VN') + 'đ'; }
+
+function renderStars(avg) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        html += `<i class="bi bi-star${i <= Math.round(avg) ? '-fill' : ''}"></i>`;
+    }
+    return html;
+}
+
+function renderReviews() {
+    // Rating summary
+    const avg = 4.5;
+    document.getElementById('avgRating').textContent = avg;
+    document.getElementById('avgStars').innerHTML = renderStars(avg);
+    document.getElementById('reviewCount').textContent = `${FAKE_REVIEWS.length} đánh giá`;
+
+    // Rating bars
+    const counts = {5:2, 4:1, 3:0, 2:0, 1:0};
+    let barsHTML = '';
+    for (let s = 5; s >= 1; s--) {
+        const pct = FAKE_REVIEWS.length > 0 ? Math.round((counts[s] / FAKE_REVIEWS.length) * 100) : 0;
+        barsHTML += `
+            <div class="rating-bar-row">
+                <span class="rating-bar-label">${s}★</span>
+                <div class="rating-bar-track"><div class="rating-bar-fill" style="width:${pct}%"></div></div>
+                <span class="rating-bar-count">${counts[s]}</span>
+            </div>
+        `;
+    }
+    document.getElementById('ratingBars').innerHTML = barsHTML;
+
+    // Review list
+    const listEl = document.getElementById('reviewList');
+    if (FAKE_REVIEWS.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center;padding:32px;color:var(--gray);">
+            <div style="font-size:2.5rem;margin-bottom:8px;">💬</div>
+            <p>Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+        </div>`;
+        return;
+    }
+    listEl.innerHTML = FAKE_REVIEWS.map(rv => `
+        <div class="review-item">
+            <div class="review-header">
+                <div class="reviewer-avatar">${rv.name[0].toUpperCase()}</div>
+                <div>
+                    <div class="reviewer-name">${rv.name}</div>
+                    <div class="review-stars">${renderStars(rv.rating)}</div>
+                </div>
+                <div class="review-date">${rv.date}</div>
+            </div>
+            <div class="review-comment">${rv.comment}</div>
+        </div>
+    `).join('');
+}
+
+function renderRelated(p) {
+    const related = PRODUCTS.filter(pr => pr.brand === p.brand && pr.id !== p.id).slice(0, 4);
+    const grid = document.getElementById('relatedGrid');
+    if (related.length === 0) { grid.parentElement.style.display = 'none'; return; }
+    grid.innerHTML = related.map(rp => `
+        <a href="product-detail.html?id=${rp.id}" class="r-card">
+            <div class="r-img">
+                <img src="${rp.image}" alt="${rp.name}" onerror="this.parentElement.innerHTML='📱'">
+            </div>
+            <div class="r-body">
+                <div class="r-name">${rp.name}</div>
+                <div class="r-price">${formatPrice(rp.price)}</div>
+            </div>
+        </a>
+    `).join('');
+}
+
+// ═══════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════
+function switchImg(el, src) {
+    document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('mainImgEl').src = src;
+}
+
+function switchTab(btn, tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+}
+
+function changeQty(delta) {
+    const input = document.getElementById('qtyInput');
+    const max   = parseInt(input.max) || 99;
+    let val = parseInt(input.value) + delta;
+    val = Math.max(1, Math.min(max, val));
+    input.value = val;
+}
+
+function setStar(n) {
+    selectedRating = n;
+    document.querySelectorAll('#starPicker i').forEach((el, i) => {
+        el.classList.toggle('active', i < n);
+    });
+}
+
+function submitReview() {
+    const comment = document.getElementById('reviewComment').value.trim();
+    const alertEl = document.getElementById('reviewAlert');
+
+    if (!selectedRating) {
+        alertEl.innerHTML = `<div class="alert-error-sm"><i class="bi bi-exclamation-circle-fill"></i> Vui lòng chọn số sao!</div>`;
+        return;
+    }
+    if (!comment) {
+        alertEl.innerHTML = `<div class="alert-error-sm"><i class="bi bi-exclamation-circle-fill"></i> Vui lòng nhập nội dung đánh giá!</div>`;
+        return;
+    }
+
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    FAKE_REVIEWS.unshift({ name: user.name || 'Bạn', rating: selectedRating, comment, date: new Date().toLocaleDateString('vi-VN') });
+
+    alertEl.innerHTML = `<div class="alert-success-sm"><i class="bi bi-check-circle-fill"></i> Cảm ơn bạn đã đánh giá!</div>`;
+    document.getElementById('reviewComment').value = '';
+    selectedRating = 0;
+    document.querySelectorAll('#starPicker i').forEach(el => el.classList.remove('active'));
+    renderReviews();
+}
+
+function addToCart(productId) {
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!user.loggedIn) { window.location.href = 'login.html'; return; }
+
+    const qty  = parseInt(document.getElementById('qtyInput').value) || 1;
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const idx  = cart.findIndex(c => c.id === productId);
+    const p    = PRODUCTS.find(pr => pr.id === productId);
+    if (!p) return;
+
+    if (idx > -1) {
+        cart[idx].qty = Math.min(cart[idx].qty + qty, p.stock);
+    } else {
+        cart.push({ id: productId, qty: Math.min(qty, p.stock) });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartBadge();
+    showToast('Đã thêm vào giỏ hàng!');
+}
+
+function buyNow(productId) {
+    addToCart(productId);
+    window.location.href = 'cart.html';
+}
+
+function updateCartBadge() {
+    const cart  = JSON.parse(localStorage.getItem('cart') || '[]');
+    const total = cart.reduce((s, c) => s + c.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    if (badge) badge.textContent = total;
+}
+
+function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `position:fixed;bottom:24px;right:24px;background:#0057FF;color:#fff;padding:12px 20px;border-radius:10px;font-size:0.875rem;font-weight:600;box-shadow:0 8px 24px rgba(0,87,255,0.3);z-index:9999;animation:slideUp 0.3s ease;`;
+    toast.textContent = '✓ ' + msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+}
+
+// Khởi động
+init();
+</script>
+</body>
+</html>
