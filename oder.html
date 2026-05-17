@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng của tôi - Phone Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root { --primary:#0057FF; --primary-dark:#0040CC; --dark:#0A0A0A; --gray:#6B7280; --light:#F8F8F8; --border:#E5E7EB; --danger:#EF4444; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Nunito',sans-serif; background:#f8f9fa; }
+
+        .orders-wrap { max-width:960px; margin:0 auto; padding:32px 24px; }
+        .page-header { margin-bottom:24px; }
+        .page-header h1 { font-size:1.5rem; font-weight:800; color:var(--dark); margin-bottom:4px; }
+        .page-header p { color:var(--gray); font-size:0.875rem; }
+
+        /* FILTER TABS */
+        .filter-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; }
+        .filter-tab { display:flex; align-items:center; gap:6px; padding:8px 16px; border-radius:100px; font-size:0.82rem; font-weight:700; text-decoration:none; border:1.5px solid var(--border); color:var(--gray); background:#fff; cursor:pointer; transition:all 0.2s; font-family:'Nunito',sans-serif; }
+        .filter-tab:hover { border-color:var(--primary); color:var(--primary); }
+        .filter-tab.active { background:var(--primary); border-color:var(--primary); color:#fff; }
+        .filter-tab .count { background:rgba(0,0,0,0.1); padding:1px 6px; border-radius:100px; font-size:0.72rem; }
+        .filter-tab.active .count { background:rgba(255,255,255,0.25); }
+
+        /* ORDER CARD */
+        .order-card { background:#fff; border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:16px; transition:box-shadow 0.2s; }
+        .order-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+        .order-card-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--border); background:#FAFAFA; flex-wrap:wrap; gap:8px; }
+        .order-code { font-family:monospace; font-size:0.85rem; font-weight:800; color:var(--primary); background:#EEF4FF; padding:3px 10px; border-radius:6px; }
+        .order-date { font-size:0.78rem; color:var(--gray); }
+        .order-status-badge { display:inline-flex; align-items:center; gap:5px; font-size:0.75rem; font-weight:700; padding:4px 12px; border-radius:100px; border:1px solid; }
+
+        /* Banners */
+        .shipping-banner { display:flex; align-items:center; gap:10px; padding:10px 20px; background:linear-gradient(90deg,#F5F3FF,#EDE9FE); border-bottom:1px solid #DDD6FE; font-size:0.82rem; }
+        .delivered-banner { display:flex; align-items:center; gap:10px; padding:10px 20px; background:linear-gradient(90deg,#F0FDF4,#DCFCE7); border-bottom:1px solid #BBF7D0; font-size:0.82rem; }
+
+        /* Order items */
+        .order-items-preview { padding:16px 20px; display:flex; flex-direction:column; gap:10px; }
+        .order-item-row { display:flex; align-items:center; gap:12px; }
+        .order-item-img { width:52px; height:52px; border-radius:8px; background:var(--light); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; border:1px solid var(--border); }
+        .order-item-img img { width:100%; height:100%; object-fit:cover; }
+        .order-item-name { font-size:0.875rem; font-weight:600; color:var(--dark); flex:1; }
+        .order-item-qty { font-size:0.78rem; color:var(--gray); }
+        .order-item-price { font-size:0.875rem; font-weight:700; color:var(--dark); white-space:nowrap; }
+        .order-more { font-size:0.78rem; color:var(--gray); font-style:italic; }
+
+        /* Footer */
+        .order-card-footer { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--border); background:#FAFAFA; flex-wrap:wrap; gap:10px; }
+        .order-total { font-size:0.875rem; color:var(--gray); }
+        .order-total strong { font-size:1rem; font-weight:800; color:#EF4444; margin-left:4px; }
+        .order-payment { font-size:0.78rem; color:var(--gray); display:flex; align-items:center; gap:4px; margin-top:2px; }
+        .order-actions { display:flex; gap:8px; }
+        .btn-order-detail { background:var(--primary); color:#fff; border:none; border-radius:8px; padding:7px 16px; font-size:0.8rem; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; text-decoration:none; transition:background 0.2s; display:inline-flex; align-items:center; gap:5px; }
+        .btn-order-detail:hover { background:var(--primary-dark); color:#fff; }
+        .btn-cancel { background:transparent; color:#EF4444; border:1.5px solid #FECACA; border-radius:8px; padding:7px 14px; font-size:0.8rem; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all 0.2s; }
+        .btn-cancel:hover { background:#FEF2F2; border-color:#EF4444; }
+
+        /* MODAL */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:16px; }
+        .modal-overlay.show { display:flex; }
+        .modal-box { background:#fff; border-radius:16px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; animation:modalIn 0.25s ease; }
+        @keyframes modalIn { from{transform:scale(0.9);opacity:0;} to{transform:scale(1);opacity:1;} }
+        .modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; z-index:1; }
+        .modal-title { font-weight:800; font-size:1rem; color:var(--dark); }
+        .modal-close { background:none; border:none; font-size:1.4rem; color:var(--gray); cursor:pointer; line-height:1; }
+        .modal-close:hover { color:var(--dark); }
+        .modal-body { padding:20px 24px; }
+        .detail-section-title { font-size:0.78rem; font-weight:800; color:var(--gray); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; margin-top:18px; }
+        .detail-row { display:flex; justify-content:space-between; padding:7px 0; font-size:0.875rem; border-bottom:1px solid #F9FAFB; }
+        .detail-row:last-child { border-bottom:none; }
+        .detail-row .lbl { color:var(--gray); }
+        .detail-row .val { font-weight:700; color:var(--dark); text-align:right; }
+        .modal-items { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+        .modal-item { display:flex; align-items:center; gap:10px; padding:10px; background:var(--light); border-radius:8px; }
+        .modal-item-img { width:44px; height:44px; border-radius:6px; background:#fff; border:1px solid var(--border); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+        .modal-item-img img { width:100%; height:100%; object-fit:cover; }
+        .modal-item-name { font-size:0.82rem; font-weight:600; color:var(--dark); flex:1; }
+        .modal-item-qty { font-size:0.78rem; color:var(--gray); }
+        .modal-item-price { font-size:0.85rem; font-weight:800; color:var(--dark); white-space:nowrap; }
+
+        /* EMPTY */
+        .empty-state { text-align:center; padding:60px 20px; background:#fff; border:1px solid var(--border); border-radius:14px; }
+        .empty-state-icon { font-size:4rem; margin-bottom:14px; }
+        .empty-state h3 { font-weight:800; color:var(--dark); margin-bottom:6px; }
+        .empty-state p { color:var(--gray); font-size:0.875rem; margin-bottom:20px; }
+        .btn-shop { background:var(--primary); color:#fff; border:none; border-radius:10px; padding:11px 24px; font-size:0.875rem; font-weight:700; font-family:'Nunito',sans-serif; text-decoration:none; transition:background 0.2s; display:inline-flex; align-items:center; gap:6px; }
+        .btn-shop:hover { background:var(--primary-dark); color:#fff; }
+
+        .cart-badge { background:var(--danger); color:#fff; font-size:0.65rem; font-weight:700; padding:2px 6px; border-radius:100px; margin-left:4px; }
+
+        @media(max-width:600px) { .orders-wrap{padding:16px;} .order-card-header{flex-direction:column;align-items:flex-start;} .order-card-footer{flex-direction:column;align-items:flex-start;} }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <span class="topbar-item"><i class="bi bi-shield-check"></i> Hàng chính hãng 100%</span>
+        <span class="topbar-item"><i class="bi bi-truck"></i> Miễn phí ship đơn từ 500K</span>
+        <span class="topbar-item"><i class="bi bi-arrow-repeat"></i> Đổi trả trong 30 ngày</span>
+        <span class="topbar-item"><i class="bi bi-headset"></i> Hotline: 1800 2097</span>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="navbar-brand">Phone<span>Store</span></a>
+        <div class="search-wrap" style="position:relative;flex:1;max-width:480px;margin:0 24px;">
+            <input type="text" id="searchInput" placeholder="Bạn muốn tìm gì hôm nay?" autocomplete="off">
+            <button class="search-btn"><i class="bi bi-search"></i></button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="products.html"><i class="bi bi-phone"></i> Sản phẩm</a></li>
+            <li><a href="contact.html"><i class="bi bi-headset"></i> Liên hệ</a></li>
+        </ul>
+        <a href="cart.html" class="cart-link">
+            <i class="bi bi-bag" style="font-size:1.1rem"></i> Giỏ hàng
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <a href="login.html" class="btn-login" id="loginBtn">
+            <i class="bi bi-person"></i> Đăng nhập
+        </a>
+    </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div style="background:#fff;border-bottom:1px solid var(--border);padding:10px 0;">
+    <div style="max-width:960px;margin:0 auto;padding:0 24px;font-size:0.82rem;color:var(--gray);">
+        <a href="index.html" style="color:var(--gray);text-decoration:none;">Trang chủ</a>
+        <i class="bi bi-chevron-right" style="font-size:0.7rem;margin:0 6px;"></i>
+        <span style="color:var(--dark);font-weight:600;">Đơn hàng của tôi</span>
+    </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="orderModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">Chi tiết đơn hàng</div>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="orders-wrap">
+    <div class="page-header">
+        <h1><i class="bi bi-bag-check" style="color:var(--primary)"></i> Đơn hàng của tôi</h1>
+        <p>Theo dõi và quản lý tất cả đơn hàng của bạn</p>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="filter-tabs" id="filterTabs"></div>
+
+    <!-- ORDER LIST -->
+    <div id="orderList"></div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container-main">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="footer-brand">Phone<span>Store</span></div>
+                <p class="footer-desc">Chuỗi cửa hàng điện thoại & phụ kiện chính hãng uy tín toàn quốc.</p>
+            </div>
+            <div class="col-lg-2 col-md-6 col-6">
+                <div class="footer-heading">Sản phẩm</div>
+                <ul class="footer-links"><li><a href="products.html">Điện thoại</a></li></ul>
+            </div>
+            <div class="col-lg-2 col-md-6 col-6">
+                <div class="footer-heading">Chính sách</div>
+                <ul class="footer-links">
+                    <li><a href="#">Đổi trả hàng</a></li>
+                    <li><a href="contact.html">Liên hệ</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <div class="footer-heading">Liên hệ</div>
+                <div class="footer-contact-item"><i class="bi bi-telephone-fill"></i><span>1800 2097</span></div>
+                <div class="footer-contact-item"><i class="bi bi-envelope-fill"></i><span>support@phonestore.com</span></div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 PhoneStore. All rights reserved.</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const PRODUCTS = [
+    { id:1,  name:'iPhone 15 Pro Max 256GB',        brand:'Apple',   image:'assets/images/products/iphone-15-pro-max-256gb-1775315484.jpg' },
+    { id:2,  name:'iPhone 16 Pro 128GB',            brand:'Apple',   image:'assets/images/products/iphone-16-pro-128gb-ch-inh-h-ang-vn-a-1775999763.webp' },
+    { id:3,  name:'iPhone 16 128GB',                brand:'Apple',   image:'assets/images/products/iphone-16-128gb-ch-inh-h-ang-vn-a-1775999533.webp' },
+    { id:4,  name:'iPhone 15 256GB',                brand:'Apple',   image:'assets/images/products/iphone-15-256gb-ch-inh-h-ang-vn-a-1775999446.webp' },
+    { id:5,  name:'iPhone 17 Pro Max 256GB',        brand:'Apple',   image:'assets/images/products/iphone-17-pro-max-256gb-1776000081.webp' },
+    { id:6,  name:'iPhone 17 Pro 256GB',            brand:'Apple',   image:'assets/images/products/iphone-17-pro-256gb-1776000031.webp' },
+    { id:7,  name:'iPhone 14 Pro Max 128GB',        brand:'Apple',   image:'assets/images/products/iphone-14-pro-max-128gb-ch-inh-h-ang-vn-a-1775999616.webp' },
+    { id:8,  name:'iPhone 16e 128GB',               brand:'Apple',   image:'assets/images/products/iphone-16e-128gb-ch-inh-h-ang-vn-a-1775999716.webp' },
+    { id:9,  name:'Samsung Galaxy S26 Ultra 256GB', brand:'Samsung', image:'assets/images/products/samsung-galaxy-s26-ultra-12gb-256gb-1775912441.webp' },
+    { id:10, name:'Samsung Galaxy S26 256GB',       brand:'Samsung', image:'assets/images/products/samsung-galaxy-s26-12gb-256gb-1775917176.webp' },
+    { id:11, name:'Samsung Galaxy S25 Ultra 256GB', brand:'Samsung', image:'assets/images/products/samsung-galaxy-s25-ultra-12gb-256gb-1775913779.webp' },
+    { id:12, name:'Samsung Galaxy S25 256GB',       brand:'Samsung', image:'assets/images/products/samsung-galaxy-s25-256gb-1775918327.webp' },
+    { id:13, name:'Samsung Galaxy A56 5G 128GB',    brand:'Samsung', image:'assets/images/products/samsung-galaxy-a56-5g-8gb-128gb-1775917465.webp' },
+    { id:14, name:'Samsung Galaxy A36 5G 128GB',    brand:'Samsung', image:'assets/images/products/samsung-galaxy-a36-5g-8gb-128gb-1775918179.webp' },
+    { id:15, name:'Samsung Galaxy Z Fold7 256GB',   brand:'Samsung', image:'assets/images/products/samsung-galaxy-z-fold7-12gb-256gb-1775917309.webp' },
+    { id:16, name:'Samsung Galaxy Z Flip7 256GB',   brand:'Samsung', image:'assets/images/products/samsung-galaxy-z-flip7-12gb-256gb-1775917584.webp' },
+];
+
+const STATUS = {
+    pending:   { label:'Chờ xác nhận', color:'#D97706', bg:'#FFFBEB', border:'#FDE68A', icon:'bi-clock' },
+    confirmed: { label:'Đã xác nhận',  color:'#2563EB', bg:'#EFF6FF', border:'#BFDBFE', icon:'bi-check-circle' },
+    shipping:  { label:'Đang giao',    color:'#7C3AED', bg:'#F5F3FF', border:'#DDD6FE', icon:'bi-truck' },
+    delivered: { label:'Đã giao',      color:'#16A34A', bg:'#F0FDF4', border:'#BBF7D0', icon:'bi-bag-check' },
+    cancelled: { label:'Đã hủy',       color:'#DC2626', bg:'#FEF2F2', border:'#FECACA', icon:'bi-x-circle' },
+};
+
+const PM_LABELS = {
+    cod:'💵 Thanh toán khi nhận hàng',
+    momo:'📱 Ví MoMo', zalopay:'💙 ZaloPay',
+    vnpay:'🏦 VNPay', bank_transfer:'🏦 Chuyển khoản'
+};
+
+function formatVND(n) { return parseInt(n).toLocaleString('vi-VN') + 'đ'; }
+
+let currentFilter = 'all';
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!user.loggedIn) { window.location.href = 'login.html'; return; }
+
+    document.getElementById('loginBtn').innerHTML = `<i class="bi bi-person-check"></i> ${user.name}`;
+    updateCartBadge();
+    renderPage();
+}
+
+function renderPage() {
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]').reverse();
+    renderTabs(orders);
+    renderOrders(orders);
+}
+
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+function renderTabs(orders) {
+    const counts = { all: orders.length };
+    orders.forEach(o => { counts[o.status] = (counts[o.status] || 0) + 1; });
+
+    const tabs = [
+        { key:'all', label:'Tất cả', icon:'bi-list-ul' },
+        { key:'pending',   ...STATUS.pending },
+        { key:'confirmed', ...STATUS.confirmed },
+        { key:'shipping',  ...STATUS.shipping },
+        { key:'delivered', ...STATUS.delivered },
+        { key:'cancelled', ...STATUS.cancelled },
+    ];
+
+    document.getElementById('filterTabs').innerHTML = tabs.map(t => `
+        <button class="filter-tab ${currentFilter === t.key ? 'active' : ''}"
+                onclick="setFilter('${t.key}')">
+            <i class="bi ${t.icon || STATUS[t.key]?.icon || 'bi-list-ul'}"></i>
+            ${t.label}
+            ${counts[t.key] ? `<span class="count">${counts[t.key]}</span>` : ''}
+        </button>
+    `).join('');
+}
+
+function setFilter(key) {
+    currentFilter = key;
+    renderPage();
+}
+
+// ═══════════════════════════════════════
+// RENDER ORDERS
+// ═══════════════════════════════════════
+function renderOrders(allOrders) {
+    const orders = currentFilter === 'all'
+        ? allOrders
+        : allOrders.filter(o => o.status === currentFilter);
+
+    const list = document.getElementById('orderList');
+
+    if (orders.length === 0) {
+        list.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <h3>Chưa có đơn hàng nào</h3>
+                <p>${currentFilter !== 'all' ? `Bạn chưa có đơn hàng "${STATUS[currentFilter]?.label || ''}" nào.` : 'Bạn chưa có đơn hàng nào.'}</p>
+                <a href="products.html" class="btn-shop"><i class="bi bi-bag"></i> Mua sắm ngay</a>
+            </div>`;
+        return;
+    }
+
+    list.innerHTML = orders.map(order => {
+        const s    = STATUS[order.status] || STATUS.pending;
+        const items = (order.items || []).map(c => {
+            const p = PRODUCTS.find(pr => pr.id === c.id);
+            return p ? { ...p, qty: c.qty } : null;
+        }).filter(Boolean);
+
+        const preview  = items.slice(0, 2);
+        const moreCount = items.length - 2;
+
+        const previewHTML = preview.map(i => `
+            <div class="order-item-row">
+                <div class="order-item-img">
+                    <img src="${i.image}" alt="${i.name}" onerror="this.parentElement.innerHTML='📱'">
+                </div>
+                <div class="order-item-name">${i.name}</div>
+                <div class="order-item-qty">x${i.qty}</div>
+            </div>
+        `).join('');
+
+        const shippingBanner = order.status === 'shipping'
+            ? `<div class="shipping-banner"><span>🚚</span><span style="color:#7C3AED;font-weight:600;">Đang trên đường giao hàng đến bạn...</span></div>`
+            : order.status === 'delivered'
+            ? `<div class="delivered-banner"><span>✅</span><span style="color:#16A34A;font-weight:800;">Đã giao hàng thành công!</span></div>`
+            : '';
+
+        const cancelBtn = order.status === 'pending'
+            ? `<button class="btn-cancel" onclick="cancelOrder('${order.code}')"><i class="bi bi-x-circle"></i> Hủy đơn</button>`
+            : '';
+
+        return `
+            <div class="order-card" id="card-${order.code}">
+                <div class="order-card-header">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <span class="order-code">${order.code}</span>
+                        <span class="order-date"><i class="bi bi-calendar3"></i> ${order.date}</span>
+                    </div>
+                    <span class="order-status-badge" style="color:${s.color};background:${s.bg};border-color:${s.border};">
+                        <i class="bi ${s.icon}"></i> ${s.label}
+                    </span>
+                </div>
+                ${shippingBanner}
+                <div class="order-items-preview">
+                    ${previewHTML}
+                    ${moreCount > 0 ? `<div class="order-more">+ ${moreCount} sản phẩm khác...</div>` : ''}
+                </div>
+                <div class="order-card-footer">
+                    <div>
+                        <div class="order-total">Tổng tiền: <strong>${formatVND(order.total)}</strong></div>
+                        <div class="order-payment"><i class="bi bi-credit-card"></i> ${PM_LABELS[order.payment] || order.payment}</div>
+                    </div>
+                    <div class="order-actions">
+                        ${cancelBtn}
+                        <button class="btn-order-detail" onclick="showDetail('${order.code}')">
+                            <i class="bi bi-eye"></i> Chi tiết
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ═══════════════════════════════════════
+// MODAL CHI TIẾT
+// ═══════════════════════════════════════
+function showDetail(code) {
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const order  = orders.find(o => o.code === code);
+    if (!order) return;
+
+    const s     = STATUS[order.status] || STATUS.pending;
+    const items = (order.items || []).map(c => {
+        const p = PRODUCTS.find(pr => pr.id === c.id);
+        return p ? { ...p, qty: c.qty } : null;
+    }).filter(Boolean);
+
+    const itemsHTML = items.map(i => `
+        <div class="modal-item">
+            <div class="modal-item-img">
+                <img src="${i.image}" alt="${i.name}" onerror="this.parentElement.innerHTML='📱'">
+            </div>
+            <div class="modal-item-name">${i.name}</div>
+            <div class="modal-item-qty">x${i.qty}</div>
+        </div>
+    `).join('');
+
+    document.getElementById('modalTitle').textContent = `Chi tiết đơn hàng • ${code}`;
+    document.getElementById('modalBody').innerHTML = `
+        <div class="detail-section-title">Trạng thái</div>
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;border:1px solid;font-size:0.82rem;font-weight:700;color:${s.color};background:${s.bg};border-color:${s.border};">
+            <i class="bi ${s.icon}"></i> ${s.label}
+        </div>
+
+        <div class="detail-section-title">Thông tin giao hàng</div>
+        <div class="detail-row"><span class="lbl">Người nhận</span><span class="val">${order.fullName}</span></div>
+        <div class="detail-row"><span class="lbl">Số điện thoại</span><span class="val">${order.phone}</span></div>
+        <div class="detail-row"><span class="lbl">Địa chỉ</span><span class="val" style="max-width:60%;text-align:right;">${order.address}</span></div>
+        ${order.note ? `<div class="detail-row"><span class="lbl">Ghi chú</span><span class="val" style="max-width:60%;text-align:right;">${order.note}</span></div>` : ''}
+
+        <div class="detail-section-title">Sản phẩm</div>
+        <div class="modal-items">${itemsHTML}</div>
+
+        <div class="detail-section-title">Thanh toán</div>
+        <div class="detail-row"><span class="lbl">Phương thức</span><span class="val">${PM_LABELS[order.payment] || order.payment}</span></div>
+        <div class="detail-row"><span class="lbl">Ngày đặt</span><span class="val">${order.date}</span></div>
+        <div class="detail-row"><span class="lbl">Tổng tiền</span><span class="val" style="color:#EF4444;font-size:1rem;">${formatVND(order.total)}</span></div>
+    `;
+
+    document.getElementById('orderModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('orderModal').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+// Bấm ra ngoài modal để đóng
+document.getElementById('orderModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+// ═══════════════════════════════════════
+// HỦY ĐƠN
+// ═══════════════════════════════════════
+function cancelOrder(code) {
+    if (!confirm('Bạn chắc chắn muốn hủy đơn hàng này?')) return;
+
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const idx    = orders.findIndex(o => o.code === code);
+    if (idx > -1 && orders[idx].status === 'pending') {
+        orders[idx].status = 'cancelled';
+        localStorage.setItem('orders', JSON.stringify(orders));
+        renderPage();
+        showToast('Đã hủy đơn hàng thành công!', '#16A34A');
+    }
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function updateCartBadge() {
+    const cart  = JSON.parse(localStorage.getItem('cart') || '[]');
+    const total = cart.reduce((s, c) => s + c.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    if (badge) badge.textContent = total;
+}
+
+function showToast(msg, color = '#0057FF') {
+    const toast = document.createElement('div');
+    toast.style.cssText = `position:fixed;bottom:24px;right:24px;background:${color};color:#fff;padding:12px 20px;border-radius:10px;font-size:0.875rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:99999;`;
+    toast.textContent = '✓ ' + msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+}
+
+init();
+</script>
+</body>
+</html>
