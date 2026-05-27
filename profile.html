@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài khoản của tôi - Phone Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root { --primary:#0057FF; --primary-dark:#0040CC; --dark:#0A0A0A; --gray:#6B7280; --light:#F8F8F8; --border:#E5E7EB; --danger:#EF4444; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Nunito',sans-serif; background:#f8f9fa; }
+
+        .profile-wrap { max-width:900px; margin:0 auto; padding:32px 24px; display:grid; grid-template-columns:260px 1fr; gap:24px; align-items:start; }
+
+        /* SIDEBAR */
+        .profile-sidebar { position:sticky; top:88px; }
+        .profile-card { background:linear-gradient(145deg,#0A0A0A,#0d1b3e); border-radius:16px; padding:24px; color:#fff; text-align:center; margin-bottom:14px; position:relative; overflow:hidden; }
+        .profile-card::before { content:''; position:absolute; width:200px; height:200px; background:radial-gradient(circle,rgba(0,87,255,0.25) 0%,transparent 70%); top:-60px; right:-60px; }
+        .profile-avatar { width:72px; height:72px; background:rgba(0,87,255,0.3); border:3px solid rgba(0,87,255,0.4); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; font-weight:800; color:#60A5FA; margin:0 auto 12px; position:relative; z-index:1; }
+        .profile-name { font-weight:800; font-size:1rem; margin-bottom:4px; position:relative; z-index:1; }
+        .profile-email { font-size:0.75rem; color:rgba(255,255,255,0.5); margin-bottom:16px; position:relative; z-index:1; }
+        .profile-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; position:relative; z-index:1; }
+        .profile-stat { background:rgba(255,255,255,0.07); border-radius:8px; padding:8px; }
+        .profile-stat-num { font-size:1.1rem; font-weight:800; color:#fff; }
+        .profile-stat-label { font-size:0.65rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.5px; }
+
+        .profile-nav { background:#fff; border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+        .profile-nav-item { display:flex; align-items:center; gap:10px; padding:12px 16px; color:var(--gray); text-decoration:none; font-size:0.875rem; font-weight:600; border-left:3px solid transparent; border-bottom:1px solid var(--border); transition:all 0.2s; cursor:pointer; background:none; border-top:none; border-right:none; width:100%; font-family:'Nunito',sans-serif; }
+        .profile-nav-item:last-child { border-bottom:none; }
+        .profile-nav-item:hover { background:var(--light); color:var(--primary); }
+        .profile-nav-item.active { color:var(--primary); background:#EEF4FF; border-left-color:var(--primary); }
+        .profile-nav-item i { font-size:1rem; width:18px; }
+
+        /* FORM */
+        .form-card { background:#fff; border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:16px; }
+        .form-card-header { padding:16px 24px; border-bottom:1px solid var(--border); }
+        .form-card-title { font-weight:800; font-size:0.95rem; color:var(--dark); display:flex; align-items:center; gap:8px; }
+        .form-card-title::before { content:''; display:inline-block; width:4px; height:16px; background:var(--primary); border-radius:2px; }
+        .form-card-body { padding:24px; }
+        .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .form-group { margin-bottom:16px; }
+        .form-group:last-child { margin-bottom:0; }
+        .form-label { display:block; font-size:0.82rem; font-weight:700; color:var(--dark); margin-bottom:6px; }
+        .input-wrap { position:relative; }
+        .input-wrap .input-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--gray); font-size:0.95rem; pointer-events:none; }
+        .form-input { width:100%; background:var(--light); border:1.5px solid var(--border); border-radius:10px; padding:10px 14px 10px 38px; font-size:0.875rem; font-family:'Nunito',sans-serif; color:var(--dark); outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
+        .form-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,87,255,0.08); background:#fff; }
+        .form-input:disabled { opacity:0.6; cursor:not-allowed; }
+        .toggle-password { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--gray); cursor:pointer; font-size:1rem; }
+        .toggle-password:hover { color:var(--primary); }
+
+        /* STRENGTH */
+        .strength-bar { height:3px; border-radius:2px; background:var(--border); margin-top:6px; overflow:hidden; }
+        .strength-fill { height:100%; border-radius:2px; width:0; transition:width 0.3s,background 0.3s; }
+        .strength-text { font-size:0.72rem; margin-top:4px; color:var(--gray); }
+
+        /* BUTTONS */
+        .btn-save { background:var(--primary); color:#fff; border:none; border-radius:10px; padding:11px 24px; font-size:0.9rem; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:7px; }
+        .btn-save:hover { background:var(--primary-dark); transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,87,255,0.25); }
+        .btn-save.loading { opacity:0.75; pointer-events:none; }
+        .btn-logout { background:transparent; color:#EF4444; border:1.5px solid #FECACA; border-radius:10px; padding:10px 20px; font-size:0.875rem; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
+        .btn-logout:hover { background:#FEF2F2; border-color:#EF4444; }
+
+        /* ALERTS */
+        .alert-success { background:#F0FDF4; border:1px solid #BBF7D0; color:#16A34A; border-radius:10px; padding:12px 16px; font-size:0.875rem; margin-bottom:16px; display:none; align-items:center; gap:8px; font-weight:600; }
+        .alert-success.show { display:flex; }
+        .alert-error { background:#FEF2F2; border:1px solid #FECACA; color:#DC2626; border-radius:10px; padding:12px 16px; font-size:0.875rem; margin-bottom:16px; display:none; align-items:center; gap:8px; }
+        .alert-error.show { display:flex; }
+
+        .cart-badge { background:var(--danger); color:#fff; font-size:0.65rem; font-weight:700; padding:2px 6px; border-radius:100px; margin-left:4px; }
+
+        @media(max-width:768px) { .profile-wrap{grid-template-columns:1fr;} .profile-sidebar{position:static;} .form-grid-2{grid-template-columns:1fr;} }
+        @media(max-width:480px) { .profile-wrap{padding:16px;} .form-card-body{padding:16px;} }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <span class="topbar-item"><i class="bi bi-shield-check"></i> Hàng chính hãng 100%</span>
+        <span class="topbar-item"><i class="bi bi-truck"></i> Miễn phí ship đơn từ 500K</span>
+        <span class="topbar-item"><i class="bi bi-arrow-repeat"></i> Đổi trả trong 30 ngày</span>
+        <span class="topbar-item"><i class="bi bi-headset"></i> Hotline: 1800 2097</span>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="navbar-brand">Phone<span>Store</span></a>
+        <div class="search-wrap" style="position:relative;flex:1;max-width:480px;margin:0 24px;">
+            <input type="text" id="searchInput" placeholder="Bạn muốn tìm gì hôm nay?" autocomplete="off">
+            <button class="search-btn"><i class="bi bi-search"></i></button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="products.html"><i class="bi bi-phone"></i> Sản phẩm</a></li>
+            <li><a href="contact.html"><i class="bi bi-headset"></i> Liên hệ</a></li>
+        </ul>
+        <a href="cart.html" class="cart-link">
+            <i class="bi bi-bag" style="font-size:1.1rem"></i> Giỏ hàng
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <a href="login.html" class="btn-login" id="loginBtn">
+            <i class="bi bi-person"></i> Đăng nhập
+        </a>
+    </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div style="background:#fff;border-bottom:1px solid var(--border);padding:10px 0;">
+    <div style="max-width:900px;margin:0 auto;padding:0 24px;font-size:0.82rem;color:var(--gray);">
+        <a href="index.html" style="color:var(--gray);text-decoration:none;">Trang chủ</a>
+        <i class="bi bi-chevron-right" style="font-size:0.7rem;margin:0 6px;"></i>
+        <span style="color:var(--dark);font-weight:600;">Tài khoản của tôi</span>
+    </div>
+</div>
+
+<div class="profile-wrap">
+
+    <!-- SIDEBAR -->
+    <div class="profile-sidebar">
+        <div class="profile-card">
+            <div class="profile-avatar" id="avatarEl">K</div>
+            <div class="profile-name" id="sidebarName">Đang tải...</div>
+            <div class="profile-email" id="sidebarEmail"></div>
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <div class="profile-stat-num" id="statOrders">0</div>
+                    <div class="profile-stat-label">Đơn hàng</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-num" id="statSpent" style="font-size:0.85rem">0đ</div>
+                    <div class="profile-stat-label">Chi tiêu</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-nav">
+            <button class="profile-nav-item active" onclick="showSection('info')">
+                <i class="bi bi-person-fill"></i> Thông tin cá nhân
+            </button>
+            <button class="profile-nav-item" onclick="showSection('password')">
+                <i class="bi bi-shield-lock"></i> Đổi mật khẩu
+            </button>
+            <a href="orders.html" class="profile-nav-item">
+                <i class="bi bi-bag-check"></i> Đơn hàng của tôi
+            </a>
+            <a href="products.html" class="profile-nav-item">
+                <i class="bi bi-phone"></i> Tiếp tục mua sắm
+            </a>
+            <button class="profile-nav-item" onclick="logout()" style="color:#EF4444;">
+                <i class="bi bi-box-arrow-right"></i> Đăng xuất
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div id="mainContent"></div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container-main">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="footer-brand">Phone<span>Store</span></div>
+                <p class="footer-desc">Chuỗi cửa hàng điện thoại & phụ kiện chính hãng uy tín toàn quốc.</p>
+            </div>
+            <div class="col-lg-2 col-md-6 col-6">
+                <div class="footer-heading">Sản phẩm</div>
+                <ul class="footer-links"><li><a href="products.html">Điện thoại</a></li></ul>
+            </div>
+            <div class="col-lg-2 col-md-6 col-6">
+                <div class="footer-heading">Chính sách</div>
+                <ul class="footer-links">
+                    <li><a href="#">Đổi trả hàng</a></li>
+                    <li><a href="contact.html">Liên hệ</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <div class="footer-heading">Liên hệ</div>
+                <div class="footer-contact-item"><i class="bi bi-telephone-fill"></i><span>1800 2097</span></div>
+                <div class="footer-contact-item"><i class="bi bi-envelope-fill"></i><span>support@phonestore.com</span></div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 PhoneStore. All rights reserved.</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function formatVND(n) { return parseInt(n||0).toLocaleString('vi-VN') + 'đ'; }
+
+let currentUser = {};
+let currentSection = 'info';
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+    currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser.loggedIn) { window.location.href = 'login.html'; return; }
+
+    // Navbar
+    document.getElementById('loginBtn').innerHTML = `<i class="bi bi-person-check"></i> ${currentUser.name}`;
+    updateCartBadge();
+
+    // Sidebar
+    document.getElementById('avatarEl').textContent     = currentUser.name?.[0]?.toUpperCase() || 'U';
+    document.getElementById('sidebarName').textContent  = currentUser.name || '';
+    document.getElementById('sidebarEmail').textContent = currentUser.email || '';
+
+    // Stats
+    const orders  = JSON.parse(localStorage.getItem('orders') || '[]');
+    const myOrders = orders.filter(o => o.status === 'delivered');
+    const spent   = myOrders.reduce((s, o) => s + parseInt(o.total || 0), 0);
+    document.getElementById('statOrders').textContent = orders.length;
+    document.getElementById('statSpent').textContent  = spent > 0 ? (spent/1000000).toFixed(1) + 'M' : '0';
+
+    showSection('info');
+}
+
+// ═══════════════════════════════════════
+// SECTIONS
+// ═══════════════════════════════════════
+function showSection(section) {
+    currentSection = section;
+    document.querySelectorAll('.profile-nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.profile-nav-item')[section === 'info' ? 0 : 1]?.classList.add('active');
+
+    if (section === 'info') renderInfo();
+    else renderPassword();
+}
+
+function renderInfo() {
+    document.getElementById('mainContent').innerHTML = `
+        <div class="alert-success" id="alertSuccess"><i class="bi bi-check-circle-fill"></i> <span id="successMsg"></span></div>
+        <div class="alert-error"   id="alertError">  <i class="bi bi-exclamation-circle-fill"></i> <span id="errorMsg"></span></div>
+
+        <!-- Thông tin cá nhân -->
+        <div class="form-card">
+            <div class="form-card-header">
+                <div class="form-card-title">Thông tin cá nhân</div>
+            </div>
+            <div class="form-card-body">
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Họ và tên *</label>
+                        <div class="input-wrap">
+                            <i class="bi bi-person input-icon"></i>
+                            <input type="text" id="fullName" class="form-input"
+                                value="${currentUser.name || ''}" placeholder="Nguyễn Văn A">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email (không thể thay đổi)</label>
+                        <div class="input-wrap">
+                            <i class="bi bi-envelope input-icon"></i>
+                            <input type="email" class="form-input" value="${currentUser.email || ''}" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Số điện thoại</label>
+                        <div class="input-wrap">
+                            <i class="bi bi-telephone input-icon"></i>
+                            <input type="text" id="phone" class="form-input"
+                                value="${currentUser.phone || ''}" placeholder="0901 234 567">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Loại tài khoản</label>
+                        <div class="input-wrap">
+                            <i class="bi bi-shield input-icon"></i>
+                            <input type="text" class="form-input"
+                                value="${currentUser.role === 'admin' ? 'Quản trị viên' : 'Khách hàng'}" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Địa chỉ giao hàng mặc định</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-geo-alt input-icon"></i>
+                        <input type="text" id="address" class="form-input"
+                            value="${currentUser.address || ''}"
+                            placeholder="Số nhà, tên đường, phường, quận, tỉnh/thành phố">
+                    </div>
+                </div>
+                <button class="btn-save" id="saveInfoBtn" onclick="saveInfo()">
+                    <i class="bi bi-check-lg"></i> Lưu thay đổi
+                </button>
+            </div>
+        </div>
+
+        <!-- Thống kê -->
+        <div class="form-card">
+            <div class="form-card-header">
+                <div class="form-card-title">Thống kê tài khoản</div>
+            </div>
+            <div class="form-card-body">
+                <div id="statsGrid"></div>
+            </div>
+        </div>
+    `;
+
+    // Render stats
+    const orders   = JSON.parse(localStorage.getItem('orders') || '[]');
+    const delivered = orders.filter(o => o.status === 'delivered');
+    const spent    = delivered.reduce((s, o) => s + parseInt(o.total || 0), 0);
+    const pending  = orders.filter(o => o.status === 'pending').length;
+
+    document.getElementById('statsGrid').innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div style="background:var(--light);border-radius:10px;padding:14px;text-align:center;">
+                <div style="font-size:1.5rem;font-weight:800;color:var(--primary);">${orders.length}</div>
+                <div style="font-size:0.75rem;color:var(--gray);font-weight:600;margin-top:2px;">Tổng đơn hàng</div>
+            </div>
+            <div style="background:var(--light);border-radius:10px;padding:14px;text-align:center;">
+                <div style="font-size:1rem;font-weight:800;color:#EF4444;">${spent > 0 ? formatVND(spent) : '0đ'}</div>
+                <div style="font-size:0.75rem;color:var(--gray);font-weight:600;margin-top:2px;">Tổng chi tiêu</div>
+            </div>
+            <div style="background:var(--light);border-radius:10px;padding:14px;text-align:center;">
+                <div style="font-size:1.5rem;font-weight:800;color:#D97706;">${pending}</div>
+                <div style="font-size:0.75rem;color:var(--gray);font-weight:600;margin-top:2px;">Đang chờ</div>
+            </div>
+        </div>
+    `;
+}
+
+function renderPassword() {
+    document.getElementById('mainContent').innerHTML = `
+        <div class="alert-success" id="alertSuccess"><i class="bi bi-check-circle-fill"></i> <span id="successMsg"></span></div>
+        <div class="alert-error"   id="alertError">  <i class="bi bi-exclamation-circle-fill"></i> <span id="errorMsg"></span></div>
+
+        <div class="form-card">
+            <div class="form-card-header">
+                <div class="form-card-title">Đổi mật khẩu</div>
+            </div>
+            <div class="form-card-body">
+                <div class="form-group">
+                    <label class="form-label">Mật khẩu hiện tại *</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input type="password" id="oldPass" class="form-input" placeholder="Nhập mật khẩu hiện tại">
+                        <button type="button" class="toggle-password" onclick="togglePass('oldPass','eye0')">
+                            <i class="bi bi-eye" id="eye0"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Mật khẩu mới *</label>
+                        <div class="input-wrap">
+                            <i class="bi bi-lock-fill input-icon"></i>
+                            <input type="password" id="newPass" class="form-input"
+                                placeholder="Tối thiểu 6 ký tự" oninput="checkStrength(this.value)">
+                            <button type="button" class="toggle-password" onclick="togglePass('newPass','eye1')">
+                                <i class="bi bi-eye" id="eye1"></i>
+                            </button>
+                        </div>
+                        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                        <div class="strength-text" id="strengthText"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Xác nhận mật khẩu mới *</label>
+                        <div class="input-wrap">
+                            <i class="bi bi-lock-fill input-icon"></i>
+                            <input type="password" id="confirmPass" class="form-input" placeholder="Nhập lại mật khẩu mới">
+                            <button type="button" class="toggle-password" onclick="togglePass('confirmPass','eye2')">
+                                <i class="bi bi-eye" id="eye2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-save" id="savePassBtn" onclick="savePassword()">
+                    <i class="bi bi-shield-lock"></i> Đổi mật khẩu
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ═══════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════
+function saveInfo() {
+    const name    = document.getElementById('fullName').value.trim();
+    const phone   = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const btn     = document.getElementById('saveInfoBtn');
+
+    hideAlerts();
+    if (!name) { showError('Vui lòng nhập họ tên!'); return; }
+
+    btn.classList.add('loading');
+    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Đang lưu...';
+
+    setTimeout(() => {
+        // Cập nhật localStorage
+        currentUser.name    = name;
+        currentUser.phone   = phone;
+        currentUser.address = address;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        // Cập nhật sidebar
+        document.getElementById('sidebarName').textContent = name;
+        document.getElementById('avatarEl').textContent    = name[0]?.toUpperCase() || 'U';
+        document.getElementById('loginBtn').innerHTML      = `<i class="bi bi-person-check"></i> ${name}`;
+
+        btn.classList.remove('loading');
+        btn.innerHTML = '<i class="bi bi-check-lg"></i> Lưu thay đổi';
+        showSuccess('Cập nhật thông tin thành công!');
+    }, 800);
+}
+
+function savePassword() {
+    const oldPass  = document.getElementById('oldPass').value.trim();
+    const newPass  = document.getElementById('newPass').value.trim();
+    const confirm  = document.getElementById('confirmPass').value.trim();
+    const btn      = document.getElementById('savePassBtn');
+
+    hideAlerts();
+
+    // Fake check mật khẩu cũ (demo accounts)
+    const DEMO_PASSWORDS = {
+        'admin@test.com': 'password',
+        'user@test.com':  '123456',
+        'kiet@test.com':  '123456',
+    };
+    const correctPass = DEMO_PASSWORDS[currentUser.email] || currentUser.password || 'password';
+
+    if (!oldPass)           { showError('Vui lòng nhập mật khẩu hiện tại!'); return; }
+    if (oldPass !== correctPass) { showError('Mật khẩu hiện tại không đúng!'); return; }
+    if (newPass.length < 6) { showError('Mật khẩu mới phải có ít nhất 6 ký tự!'); return; }
+    if (newPass !== confirm) { showError('Mật khẩu xác nhận không khớp!'); return; }
+
+    btn.classList.add('loading');
+    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Đang đổi...';
+
+    setTimeout(() => {
+        currentUser.password = newPass;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        btn.classList.remove('loading');
+        btn.innerHTML = '<i class="bi bi-shield-lock"></i> Đổi mật khẩu';
+
+        document.getElementById('oldPass').value     = '';
+        document.getElementById('newPass').value     = '';
+        document.getElementById('confirmPass').value = '';
+        document.getElementById('strengthFill').style.width = '0';
+        document.getElementById('strengthText').textContent = '';
+
+        showSuccess('Đổi mật khẩu thành công!');
+    }, 800);
+}
+
+function logout() {
+    if (!confirm('Bạn có chắc muốn đăng xuất?')) return;
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function showSuccess(msg) {
+    document.getElementById('successMsg').textContent = msg;
+    document.getElementById('alertSuccess').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showError(msg) {
+    document.getElementById('errorMsg').textContent = msg;
+    document.getElementById('alertError').classList.add('show');
+}
+
+function hideAlerts() {
+    document.getElementById('alertSuccess')?.classList.remove('show');
+    document.getElementById('alertError')?.classList.remove('show');
+}
+
+function togglePass(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    input.type  = input.type === 'password' ? 'text' : 'password';
+    icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+}
+
+function checkStrength(val) {
+    const fill = document.getElementById('strengthFill');
+    const text = document.getElementById('strengthText');
+    if (!fill) return;
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+        { w:'0%',   bg:'#E5E7EB', label:'' },
+        { w:'25%',  bg:'#EF4444', label:'😟 Yếu' },
+        { w:'50%',  bg:'#F97316', label:'😐 Trung bình' },
+        { w:'75%',  bg:'#EAB308', label:'🙂 Khá tốt' },
+        { w:'90%',  bg:'#22C55E', label:'😊 Tốt' },
+        { w:'100%', bg:'#059669', label:'💪 Rất mạnh' },
+    ];
+    const lv = val.length === 0 ? 0 : Math.min(score + 1, 5);
+    fill.style.width      = levels[lv].w;
+    fill.style.background = levels[lv].bg;
+    text.textContent      = levels[lv].label;
+    text.style.color      = levels[lv].bg;
+}
+
+function updateCartBadge() {
+    const cart  = JSON.parse(localStorage.getItem('cart') || '[]');
+    const total = cart.reduce((s, c) => s + c.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    if (badge) badge.textContent = total;
+}
+
+init();
+</script>
+</body>
+</html>
